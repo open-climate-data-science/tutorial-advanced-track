@@ -1,0 +1,44 @@
+---
+title: "AdvTutorial"
+author: "Nicholas Gawron"
+date: "1/28/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(tidyverse)
+library(rnoaa)
+```
+
+# Advanced Tutorial
+
+
+## Importing Data From NCEI
+
+Text on importing **with an API**.
+
+```{r}
+
+```
+
+## Machine Learning 
+
+### Basic Plotting with Ggplot 
+
+EDA is how we can motivate future ML models!
+
+Text on *plotting*. 
+
+```{r}
+
+```
+
+### Logistic Regression !
+
+```{r}
+
+```
+
