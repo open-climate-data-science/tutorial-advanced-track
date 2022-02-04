@@ -38,7 +38,7 @@ Text on *plotting*.
 
 ```
 
-### Logistic Regression !
+### Logistic Regression ! TIme Series forecasting
 
 ```{r}
 
