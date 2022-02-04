@@ -1,12 +1,11 @@
 ---
 title: "AdvTutorial"
-author: "Nicholas Gawron"
+author: "Nicholas Gawron & Livia Popa"
 date: "1/28/2022"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(echo = TRUE)
 library(ggplot2)
 library(tidyverse)
@@ -21,6 +20,9 @@ library(rnoaa)
 Text on importing **with an API**.
 
 ```{r}
+library(httr)
+library(jsonlite)
+url = "https://www.ncdc.noaa.gov/cdo-web/api/v2/"
 
 ```
 
