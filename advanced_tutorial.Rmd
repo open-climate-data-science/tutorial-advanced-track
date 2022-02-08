@@ -22,8 +22,13 @@ Text on importing **with an API**.
 ```{r}
 library(httr)
 library(jsonlite)
-url = "https://www.ncdc.noaa.gov/cdo-web/api/v2/"
+base_url <- "https://www.ncdc.noaa.gov/cdo-web/api/v2/"
+endpoint <- "datasets"
+token <- "gykUMKPJzpcpQonBrUWjbFqYevOPkhwc"
+full_url <- paste0(base_url, "/",endpoint,"/")
+Raw  <- GET(full_url)
 
+curl -H "token:gykUMKPJzpcpQonBrUWjbFqYevOPkhwc" "https://www.ncdc.noaa.gov/cdo-web/api/v2/datasets" $.ajax({ url:https://www.ncdc.noaa.gov/cdo-web/api/v2/datasets, data:{/datasets}, headers:{ token:gykUMKPJzpcpQonBrUWjbFqYevOPkhwc} })
 ```
 
 ## Machine Learning 
