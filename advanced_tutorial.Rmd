@@ -46,6 +46,10 @@ Text on *plotting*.
 ### Logistic Regression ! TIme Series forecasting
 
 ```{r}
+#logistic regression
+fit1 = glm(IfRain~date, data=cardinal, family="binomial")
+summary(fit1)
 
+#predict something with logistic regression
 ```
 
