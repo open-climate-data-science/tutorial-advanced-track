@@ -85,3 +85,20 @@ summary(fit1)
 
 ```
 
+
+```{r}
+temp_ts <- xts(cardinal$AvgT,cardinal$date)
+temp_ts
+  
+autoplot(temp_ts[1:600])
+
+half_temp <-temp_ts[1:600]
+
+library(forecast)
+d.arima <- auto.arima(half_temp)
+d.forecast <- forecast(d.arima, level = c(90), h = 200)
+autoplot(d.forecast)
+
+```
+
+
