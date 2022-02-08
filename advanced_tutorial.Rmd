@@ -10,6 +10,9 @@ knitr::opts_chunk$set(echo = TRUE)
 library(ggplot2)
 library(tidyverse)
 library(rnoaa)
+library(forecast)
+install.packages("xts")                      # Install & load xts package
+library("xts")
 ```
 
 # Advanced Tutorial
@@ -39,7 +42,35 @@ EDA is how we can motivate future ML models!
 
 Text on *plotting*. 
 
+### Content from beg. lecture
+
 ```{r}
+
+cardinal <- read_csv("cardinal_data.csv", 
+     col_types = list(`Average Air Temperature (F)` = col_number(), 
+         `Maximum Air Temperature (F)` = col_number(), 
+         `Minimum Air Temperature (F)` = col_number(), 
+         `Average Experimental Leaf Wetness (mV)` = col_number(), 
+         `Total Precipitation (in)` = col_number(), 
+         `Average Relative Humidity (%)` = col_number(), 
+         `Average Soil Moisture (m3/m3)` = col_number(), 
+         `Average Soil Temperature (F)` = col_number(), 
+         `Average Solar Radiation (W/m2)` = col_number(), 
+         `Average Station Pressure (mb)` = col_number()))
+
+cardinal<-drop_na(cardinal)
+str(cardinal)
+cardinal$Date<-as.Date(cardinal$Date, tryFormats= c("%m/%d/%y"))
+view(cardinal)
+
+#changes col names
+colnames(cardinal)=c("date","AvgT","MaxT","MinT","AvgLw","Tprep","AvgHum","AvgSm","AvgSt","AvgSr","AvgStp")
+
+
+
+cardinal$IfRain<- (cardinal$Tprep>0)
+cardinal$IfRain<-as.factor(as.integer(cardinal$IfRain))
+
 
 ```
 
@@ -51,5 +82,6 @@ fit1 = glm(IfRain~date, data=cardinal, family="binomial")
 summary(fit1)
 
 #predict something with logistic regression
+
 ```
 
