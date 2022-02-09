@@ -161,17 +161,16 @@ options(noaakey = "TcAEMgEqaTjgGnnuyYbLXxmIJxiTPKuN")
 #list of all stations
 ghcnd_stations()
 
-#list of all stations given certain lattitude and logitudes
+#tibble  of all stations given certain lattitude and logitudes
 raliegh_stations<-ghcnd_stations()%>%dplyr::filter(latitude>34 & latitude<36 & longitude>-80 & longitude< -75)
 
-raliegh_stations
 
 
 
 ```
 
 ```{r}
-Ralz_dat<-ncdc_datasets(datasetid ="US1NCBF0003")
-Ralz_dat$data
+Ralz_dat <- ncdc(datasetid='GHCND', stationid='GHCND:US1NCAL0013', datatypeid='PRCP', startdate = '2010-05-01', enddate = '2010-10-31', limit=500, add_units = TRUE)
+
 ```
 
