@@ -74,6 +74,10 @@ cardinal$IfRain<-as.factor(as.integer(cardinal$IfRain))
 
 ```
 
+## Testing and training data
+
+- 
+
 ### Logistic Regression ! TIme Series forecasting
 
 ```{r}
