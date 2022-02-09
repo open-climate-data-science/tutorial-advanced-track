@@ -106,11 +106,47 @@ autoplot(d.forecast)
 ```
 
 
+### PCA to cluster rain variable 
+
 
 ```{r}
+IfRainVar<- cardinal$IfRain
+cardshort <- cardinal%>%select(-c(date,IfRain,Tprep,MinT,MaxT))
+cardshort
+
+pca_card<- princomp(scale(cardshort,scale=FALSE),cor = FALSE)
+
+
+plot(pca_card$scores, pch = 16, col =IfRainVar)
+legend("topright",c("No Rain","Rain"),pch=16,col=c("black","red"))
 
 ```
 
 
+```{r}
+summary(pca_card)
+```
 
+
+```{r}
+screeplot(pca_card, type = "lines")
+```
+
+
+### How are the original variables related to the principal components?
+
+```{r}
+loadings(pca_card)
+```
+
+
+The loadings are simple correlations between the principal components and the original variables (Pearson’s r). Values closest to 1 (positive) or -1 (negative) will represent the strongest relationships, with zero being uncorrelated.
+
+We see in PC 1 that there is a high positive correlation between AvgSr. We see the correlation between solar radiation and ...
+
+
+
+```{r}
+biplot(pca_card)
+```
 
