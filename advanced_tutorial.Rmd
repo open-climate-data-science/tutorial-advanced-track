@@ -11,7 +11,7 @@ library(ggplot2)
 library(tidyverse)
 library(rnoaa)
 library(forecast)
-install.packages("xts")                      # Install & load xts package
+#install.packages("xts")                      # Install & load xts package
 library("xts")
 ```
 
@@ -148,5 +148,30 @@ We see in PC 1 that there is a high positive correlation between AvgSr. We see t
 
 ```{r}
 biplot(pca_card)
+```
+
+
+
+
+```{r}
+
+options(noaakey = "TcAEMgEqaTjgGnnuyYbLXxmIJxiTPKuN")
+
+
+#list of all stations
+ghcnd_stations()
+
+#list of all stations given certain lattitude and logitudes
+raliegh_stations<-ghcnd_stations()%>%dplyr::filter(latitude>34 & latitude<36 & longitude>-80 & longitude< -75)
+
+raliegh_stations
+
+
+
+```
+
+```{r}
+Ralz_dat<-ncdc_datasets(datasetid ="US1NCBF0003")
+Ralz_dat$data
 ```
 
