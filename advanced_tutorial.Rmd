@@ -155,6 +155,8 @@ biplot(pca_card)
 
 
 
+## Attempting to pull data from RNOAA  - not super successful rn
+
 
 ```{r}
 
@@ -175,7 +177,8 @@ real_ral
 ```
 
 ```{r}
-Ralz_dat <- ncdc(datasetid='GHCND', stationid='GHCND:US1NCAL0013', datatypeid=c('TAVG','PRCP'), startdate = '2011-05-01', enddate="2018-11-01", add_units = TRUE)
+Ralz_dat <- ncdc(datasetid='GHCND', stationid='GHCND:US1NCAL0013', datatypeid=c('TAVG','PRCP'), startdate = '2011-01-01', enddate="2011-12-31", add_units = TRUE)
+
 Ralz_dat
 
 ```
