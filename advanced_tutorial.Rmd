@@ -160,7 +160,7 @@ biplot(pca_card)
 
 ```{r}
 
-options(noaakey = "TcAEMgEqaTjgGnnuyYbLXxmIJxiTPKuN")
+options(noaakey = "--key goes here --")
 
 
 #list of all stations
