@@ -164,13 +164,11 @@ ghcnd_stations()
 #tibble  of all stations given certain lattitude and logitudes
 raliegh_stations<-ghcnd_stations()%>%dplyr::filter(latitude>34 & latitude<36 & longitude>-80 & longitude< -75)
 
-
-
-
 ```
 
 ```{r}
-Ralz_dat <- ncdc(datasetid='GHCND', stationid='GHCND:US1NCAL0013', datatypeid='PRCP', startdate = '2010-05-01', enddate = '2010-10-31', limit=500, add_units = TRUE)
+Ralz_dat <- ncdc(datasetid='GHCND', stationid='GHCND:US1NCAL0013', datatypeid=c('TMAX','TMIN','PRCP'), startdate = '2011-05-01', enddate="2011-11-01", add_units = TRUE)
+Ralz_dat
 
 ```
 
