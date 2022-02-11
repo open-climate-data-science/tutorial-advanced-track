@@ -161,7 +161,7 @@ biplot(pca_card)
 ```{r}
 
 options(noaakey = "--key goes here --")
-
+# a comment goes here
 
 #list of all stations
 ghcnd_stations()
