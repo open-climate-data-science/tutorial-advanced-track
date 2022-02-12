@@ -2,14 +2,19 @@
 title: "AdvTutorial"
 author: "Nicholas Gawron & Livia Popa"
 date: "1/28/2022"
-output: html_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+#package for plotting 
 library(ggplot2)
+#package for cleaning data and logical things 
 library(tidyverse)
+# weather station data from NOAA API 
 library(rnoaa)
+
+#time series related 
 library(forecast)
 #install.packages("xts")                      # Install & load xts package
 library("xts")
@@ -22,135 +27,18 @@ library("xts")
 
 Text on importing **with an API**.
 
-```{r}
-library(httr)
-library(jsonlite)
-base_url <- "https://www.ncdc.noaa.gov/cdo-web/api/v2/"
-endpoint <- "datasets"
-token <- "gykUMKPJzpcpQonBrUWjbFqYevOPkhwc"
-full_url <- paste0(base_url, "/",endpoint,"/")
-Raw  <- GET(full_url)
-
-curl -H "token:gykUMKPJzpcpQonBrUWjbFqYevOPkhwc" "https://www.ncdc.noaa.gov/cdo-web/api/v2/datasets" $.ajax({ url:https://www.ncdc.noaa.gov/cdo-web/api/v2/datasets, data:{/datasets}, headers:{ token:gykUMKPJzpcpQonBrUWjbFqYevOPkhwc} })
-```
-
-## Machine Learning 
-
-### Basic Plotting with Ggplot 
-
-EDA is how we can motivate future ML models!
-
-Text on *plotting*. 
-
-### Content from beg. lecture
+- This explains how to extract data without a package for certain API's 
 
 ```{r}
+##library(httr)
+#library(jsonlite)
+#base_url <- "https://www.ncdc.noaa.gov/cdo-web/api/v2/"
+#endpoint <- "datasets"
+#token <- "gykUMKPJzpcpQonBrUWjbFqYevOPkhwc"
+#full_url <- paste0(base_url, "/",endpoint,"/")
+#Raw  <- GET(full_url)
 
-cardinal <- read_csv("cardinal_data.csv", 
-     col_types = list(`Average Air Temperature (F)` = col_number(), 
-         `Maximum Air Temperature (F)` = col_number(), 
-         `Minimum Air Temperature (F)` = col_number(), 
-         `Average Experimental Leaf Wetness (mV)` = col_number(), 
-         `Total Precipitation (in)` = col_number(), 
-         `Average Relative Humidity (%)` = col_number(), 
-         `Average Soil Moisture (m3/m3)` = col_number(), 
-         `Average Soil Temperature (F)` = col_number(), 
-         `Average Solar Radiation (W/m2)` = col_number(), 
-         `Average Station Pressure (mb)` = col_number()))
-
-cardinal<-drop_na(cardinal)
-str(cardinal)
-cardinal$Date<-as.Date(cardinal$Date, tryFormats= c("%m/%d/%y"))
-view(cardinal)
-
-#changes col names
-colnames(cardinal)=c("date","AvgT","MaxT","MinT","AvgLw","Tprep","AvgHum","AvgSm","AvgSt","AvgSr","AvgStp")
-
-
-
-cardinal$IfRain<- (cardinal$Tprep>0)
-cardinal$IfRain<-as.factor(as.integer(cardinal$IfRain))
-
-
-```
-
-## Testing and training data
-
-- 
-
-### Logistic Regression ! TIme Series forecasting
-
-```{r}
-#logistic regression
-fit1 = glm(IfRain~date, data=cardinal, family="binomial")
-summary(fit1)
-
-#predict something with logistic regression
-
-```
-
-
-```{r}
-
-# n climate  grid data
-
-temp_ts <- xts(cardinal$AvgT,cardinal$date)
-temp_ts
-  
-autoplot(temp_ts[1:600])
-
-half_temp <-temp_ts[1:600]
-
-library(forecast)
-d.arima <- auto.arima(half_temp)
-d.forecast <- forecast(d.arima, level = c(90), h = 200)
-autoplot(d.forecast)
-
-```
-
-
-### PCA to cluster rain variable 
-
-
-```{r}
-IfRainVar<- cardinal$IfRain
-cardshort <- cardinal%>%select(-c(date,IfRain,Tprep,MinT,MaxT))
-cardshort
-
-pca_card<- princomp(scale(cardshort,scale=FALSE),cor = FALSE)
-
-
-plot(pca_card$scores, pch = 16, col =IfRainVar)
-legend("topright",c("No Rain","Rain"),pch=16,col=c("black","red"))
-
-```
-
-
-```{r}
-summary(pca_card)
-```
-
-
-```{r}
-screeplot(pca_card, type = "lines")
-```
-
-
-### How are the original variables related to the principal components?
-
-```{r}
-loadings(pca_card)
-```
-
-
-The loadings are simple correlations between the principal components and the original variables (Pearson’s r). Values closest to 1 (positive) or -1 (negative) will represent the strongest relationships, with zero being uncorrelated.
-
-We see in PC 1 that there is a high positive correlation between AvgSr. We see the correlation between solar radiation and ...
-
-
-
-```{r}
-biplot(pca_card)
+#curl -H "token:gykUMKPJzpcpQonBrUWjbFqYevOPkhwc" #"https://www.ncdc.noaa.gov/cdo-web/api/v2/datasets" $.ajax({ url:https://www.ncdc.noaa.gov/cdo-web/api/v2/datasets, data:{/datasets}, headers:{ token:gykUMKPJzpcpQonBrUWjbFqYevOPkhwc} })
 ```
 
 
@@ -183,4 +71,176 @@ Ralz_dat
 
 #medeo_tidy
 ```
+
+## Machine Learning 
+
+
+### Content from beg. lectures for time being 
+
+```{r}
+
+cardinal <- read_csv("cardinal_data.csv", 
+     col_types = list(`Average Air Temperature (F)` = col_number(), 
+         `Maximum Air Temperature (F)` = col_number(), 
+         `Minimum Air Temperature (F)` = col_number(), 
+         `Average Experimental Leaf Wetness (mV)` = col_number(), 
+         `Total Precipitation (in)` = col_number(), 
+         `Average Relative Humidity (%)` = col_number(), 
+         `Average Soil Moisture (m3/m3)` = col_number(), 
+         `Average Soil Temperature (F)` = col_number(), 
+         `Average Solar Radiation (W/m2)` = col_number(), 
+         `Average Station Pressure (mb)` = col_number()))
+
+cardinal<-drop_na(cardinal)
+str(cardinal)
+cardinal$Date<-as.Date(cardinal$Date, tryFormats= c("%m/%d/%y"))
+view(cardinal)
+
+#changes col names
+colnames(cardinal)=c("date","AvgT","MaxT","MinT","AvgLw","Tprep","AvgHum","AvgSm","AvgSt","AvgSr","AvgStp")
+
+
+
+cardinal$IfRain<- (cardinal$Tprep>0)
+cardinal$IfRain<-as.factor(as.integer(cardinal$IfRain))
+
+
+```
+
+### Basic Plotting with Ggplot 
+
+
+```{r}
+ggplot(cardinal,aes(x=date,y=AvgT))+geom_line()+labs(title="Total Daily Rainfall by Date",y="Average Tempurature (F) ", x= "Date")
+```
+
+- EDA is how we can motivate future ML models!
+
+- We can use forecasting to extend this trend!
+
+
+## Testing and training data
+
+- concept of seeing how well a model works 
+
+- *cut to nice images of cross-validation?*
+
+### TIme Series forecasting
+
+
+- We were thinking of using logistic regression  but may not?
+
+```{r}
+#logistic regression
+fit1 = glm(IfRain~date+AvgT+AvgLw+AvgSt+AvgSr, data=cardinal, family="binomial")
+summary(fit1)
+
+#predict something with logistic regression
+
+```
+
+
+
+
+```{r}
+
+# n climate  grid data
+
+temp_ts <- xts(cardinal$AvgT,cardinal$date)
+head(temp_ts)
+  
+autoplot(temp_ts[1:600])
+
+half_temp <-temp_ts[1:600]
+
+library(forecast)
+d.arima <- auto.arima(half_temp)
+d.forecast <- forecast(d.arima, level = c(90), h = 200)
+autoplot(d.forecast)
+
+```
+
+
+### PCA to cluster rain variable 
+
+
+- using cardinal data to obsevre *if* there is clustering 
+
+- used for future models
+
+- helps us describe higher dimensional data with **less**
+
+
+Three general steps: 
+
+  1. Remove heavily correlated columns! 
+    - Min Temp and Max Temp for a certain day will correlate with one another!
+    
+  2. Center Data
+
+Observe: 
+
+```{r}
+library(corrplot)
+corrplot(cor(cardinal[,-c(1,12)]))
+```
+
+- Tells us to remove all but one temperature variable
+
+
+```{r}
+IfRainVar<- cardinal$IfRain
+cardshort <- cardinal%>%select(-c(date,IfRain,Tprep,MinT,MaxT))
+cardshort
+
+pca_card<- princomp(scale(cardshort,scale=FALSE),cor = FALSE)
+
+
+plot(pca_card$scores, pch = 16, col =IfRainVar)
+legend("topright",c("No Rain","Rain"),pch=16,col=c("black","red"))
+
+```
+
+- Here we can look at how good PCA does at describing changes in data 
+
+- We see 2 components describes 96% of the data's variation ! (This is very good)
+
+```{r}
+summary(pca_card)
+```
+
+
+
+```{r}
+screeplot(pca_card, type = "lines")
+```
+
+
+### How are the original variables related to the principal components?
+
+- Does not print small values, less impactful to correlation 
+
+```{r}
+loadings(pca_card)
+```
+
+
+- The loading are simple correlations between the principal components and the original variables (Pearson’s r).
+
+- Values closest to 1 (positive) or -1 (negative) will represent the strongest relationships, with zero being uncorrelated.
+
+We see in PC 1 that there is a high positive correlation between AvgSr. We see the correlation between solar radiation and the component direction is quite high. So by looking at the second component or the y-axis of our previous plot: we see for the most part, Leaf wetness correlated well with the occurance of rain.   
+
+
+- Another visual to observe the impact of each variable on the principal component!  
+
+- Not super pretty here
+
+```{r}
+biplot(pca_card)
+```
+
+
+
+
 
