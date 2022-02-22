@@ -18,6 +18,9 @@ library(rnoaa)
 library(forecast)
 #install.packages("xts")                      # Install & load xts package
 library("xts")
+
+library(ClusterR)
+library(cluster)
 ```
 
 # Advanced Tutorial
@@ -63,6 +66,8 @@ raliegh_stations
 real_ral<-ghcnd(stationid='GHCND:US1NCAL0013')
 real_ral
 ```
+
+
 
 ```{r}
 Ralz_dat <- ncdc(datasetid='GHCND', stationid='GHCND:US1NCAL0013', datatypeid=c('TAVG','PRCP'), startdate = '2011-01-01', enddate="2011-12-31", add_units = TRUE)
