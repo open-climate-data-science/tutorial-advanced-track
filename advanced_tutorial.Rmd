@@ -1,8 +1,8 @@
 ---
-title: "AdvTutorial"
-author: "Nicholas Gawron & Livia Popa"
-date: "1/28/2022"
-output: pdf_document
+title: "North Carolina State Climate Office "
+output:
+  html_document:
+    code_folding: hide
 ---
 
 ```{r setup, include=FALSE}
@@ -23,10 +23,31 @@ library(ClusterR)
 library(cluster)
 ```
 
-# Advanced Tutorial
+# OCDS Advanced Track Tutorial{.tabset}
 
 
-## Importing Data From NCEI
+## Tutorial Learning Goals
+
+Welcome to the NCSCO OCDS Intro track tutorial. We are  [Nick Gawron](https://www.linkedin.com/in/ngawrondata/) and [Livia Popa](https://www.linkedin.com/in/livia-popa-23a018183/), we will be working with you through today's tutorial.  We will be using R studio for today's session. 
+
+We will be tackling these objectives:
+
+- *Define* open data and reproducible science
+- *Describe* how to navigate important aspects of the R/RStudio user-interface
+- *Recall* how to extract public data from a web portal (Cardinal) and import it into a  data software (R/RStudio)
+- *Demonstrate* understanding of dataset and statistical software through exploratory data analysis plots and numerical summaries
+
+### Meet Mr. Wuf!
+
+Mr. Wuf works for Mount Mitchell State Park in Burnsville, NC and was recently asked by his boss to write a report summarizing rainfall and temperature data for 2021. This report will be used to help optimize 2022 event planning (e.g., fall color viewing) for park visitors and maintenance scheduling for park staff. Mr. Wuf’s wife, Mrs. Wuf, recently told him about the State Climate Office of North Carolina’s new Cardinal and Station Scout data portals. He agrees with her that it would be a great opportunity to check out these new, free tools. After some preliminary sleuthing around Station Scout, he discovered there was a National Weather Service Cooperative Observer Program (COOP; https://www.weather.gov/rah/coop) station on park property (station # 315923). How did he miss this? Once he downloads these data from Cardinal, Mr. Wuf plans to put the skills he learned in an online R programming course to the test for this real-world, work-related project.\
+
+## API 
+
+### API Introduction 
+
+### nClimgrid Data Set
+
+### Importing Data on nClimGrid 
 
 Text on importing **with an API**.
 
