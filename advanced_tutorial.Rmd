@@ -21,6 +21,7 @@ library("xts")
 
 library(ClusterR)
 library(cluster)
+library(broom)
 ```
 
 # OCDS Advanced Track Tutorial{.tabset}
@@ -46,6 +47,12 @@ Mr. Wuf works for Mount Mitchell State Park in Burnsville, NC and was recently a
 ### API Introduction 
 
 ### nClimgrid Data Set
+
+```{r}
+nclim<-read_csv('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/decadal/2020-2021-ste-decadal.csv')%>%drop_na()
+
+```
+
 
 ### Importing Data on nClimGrid 
 
@@ -99,6 +106,39 @@ Ralz_dat
 ```
 
 ## Machine Learning 
+
+### K-Means Clustering in nClimGridData
+
+#### Creating Functions
+
+```{r}
+calculate_cluster <- function(data, k) {
+  x <- data %>%
+    na.omit() %>%
+    scale()
+  
+  df <- kmeans(x, center = k) %>%
+    augment(data) %>% # creates column ".cluster" with cluster label
+    mutate(silhouette = cluster::silhouette(as.integer(.cluster), dist(x))[, "sil_width"]) # calculate silhouette score
+  
+  return(df)
+}
+
+```
+
+
+```{r}
+plot(nclim$PRCP,nclim$TAVG)
+
+data2cluster<-data.frame(nclim$PRCP, nclim$TAVG)
+
+df<-calculate_cluster(data2cluster,4)
+df
+```
+
+
+
+
 
 
 ### Content from beg. lectures for time being 
