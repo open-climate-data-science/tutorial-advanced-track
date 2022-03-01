@@ -22,6 +22,10 @@ library("xts")
 library(ClusterR)
 library(cluster)
 library(broom)
+
+#other packages for kmeans
+library(here)
+library(tidymodels)
 ```
 
 # OCDS Advanced Track Tutorial{.tabset}
