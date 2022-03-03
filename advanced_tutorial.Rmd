@@ -57,44 +57,6 @@ nclim<-read_csv('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/decad
 
 ```
 
-
-### Importing Data on nClimGrid 
-
-Text on importing **with an API**.
-
-- This explains how to extract data without a package for certain API's 
-
-## Attempting to pull data from RNOAA  - not super successful rn
-
-
-```{r}
-
-options(noaakey = "--key goes here --")
-# a comment goes here
-
-#list of all stations
-ghcnd_stations()
-
-#tibble  of all stations given certain lattitude and logitudes
-raliegh_stations<-ghcnd_stations()%>%dplyr::filter(latitude>34 & latitude<36 & longitude>-80 & longitude< -75)
-
- 
-raliegh_stations
-
-real_ral<-ghcnd(stationid='GHCND:US1NCAL0013')
-real_ral
-```
-
-
-
-```{r}
-Ralz_dat <- ncdc(datasetid='GHCND', stationid='GHCND:US1NCAL0013', datatypeid=c('TAVG','PRCP'), startdate = '2011-01-01', enddate="2011-12-31", add_units = TRUE)
-
-Ralz_dat
-
-#medeo_tidy
-```
-
 ## Machine Learning 
 
 ### K-Means Clustering in nClimGridData
