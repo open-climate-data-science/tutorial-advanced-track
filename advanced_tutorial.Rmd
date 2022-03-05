@@ -80,13 +80,23 @@ head(nclim)
 
 ```{r}
 # scatterplot of tempurature vs time
-ggplot(nclim,aes(x=date,y=tavg_degf))+geom_point(colour="blue")+labs(x = "Date", y = "Average Tempurature (C)",title ="Tempurature Over Time")
-
+plotOtemp<-ggplot(nclim,aes(x=date,y=tavg_degf))+geom_point(colour="red")+labs(x = "Date", y = "Average Tempurature (C)",title ="Tempurature Over Time")
+plotOtemp
 ```
 
 
 
 ## Machine Learning 
+
+
+### Simple Regression 
+
+```{r}
+plotOtemp+geom_smooth(method="lm",se=TRUE,col = "black")+theme_classic()
+```
+### Time Series ?
+
+
 
 ### K-Means Clustering in nClimGridData
 
@@ -288,6 +298,8 @@ biplot(pca_card)
 ```
 
 
+
+### Closing 
 
 
 
