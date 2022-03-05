@@ -49,6 +49,7 @@ Mr. Wuf works for Mount Mitchell State Park in Burnsville, NC and was recently a
 ## API 
 
 ### API Introduction 
+
 - API is the acronym for Application Programming Interface that enables applications to exchange data and functionality easily and securely.
 
 - The API data that we will be using is called nClimgrid which consists of four climate variables derived from the GHCN-Dataset: maximum temperature, minimum temperature, average temperature, and precipitation. 
@@ -65,8 +66,13 @@ nclim<-read_csv('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/decad
 ```{r}
 ## inspect data 
 
-view(nclim)
-ggpolt(nclim,aes(x=date,y=TMIN))+geom_point(colour="green")
+head(nclim)
+
+
+colnames(nclim)[8:10]<-colnames(nclim)[8:10]%>%tolower()%>% paste0("_degf")
+colnames(nclim)[7]<-colnames(nclim)[7]%>%tolower()%>% paste0("_in")
+
+head(nclim)
 ```
 
 ## EDA
@@ -74,6 +80,7 @@ ggpolt(nclim,aes(x=date,y=TMIN))+geom_point(colour="green")
 
 ```{r}
 # scatterplot of 
+ggpolt(nclim,aes(x=date,y=tavg))+geom_point(colour="green")
 ggplot(nclim,aes(x=date,y=PRCP))+geom_point()
 ```
 
