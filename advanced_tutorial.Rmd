@@ -38,9 +38,9 @@ Welcome to the NCSCO OCDS Intro track tutorial. We are  [Nick Gawron](https://ww
 We will be tackling these objectives:
 
 - *Define* open data and reproducible science
-- *Describe* how to navigate important aspects of the R/RStudio user-interface
-- *Recall* how to extract public data from a web portal (Cardinal) and import it into a  data software (R/RStudio)
-- *Demonstrate* understanding of dataset and statistical software through exploratory data analysis plots and numerical summaries
+- *Recognize* the importance of statistical analysis for climate data analysis using cloud based data
+- *Apply* techniques to access and explore publicly available climate data from the cloud using exploratory data analysis
+- *Create* a machine learning model to predicts results for a representative case study
 
 ### Meet Mr. Wuf!
 
@@ -287,7 +287,24 @@ We see in PC 1 that there is a high positive correlation between AvgSr. We see t
 biplot(pca_card)
 ```
 
+## Closing & Resources
 
+- *Define* open data and reproducible science
+- *Recognize* the importance of statistical analysis for climate data analysis using cloud based data
+- *Apply* techniques to access and explore publicly available climate data from the cloud using exploratory data analysis
+- *Create* a machine learning model to predicts results for a representative case study
+
+\center
+Any Questions? 
+\center
+
+### Resouces
+
+- For a A Hydrologists Guide to Open Science, from the HESS Journal, click [here](https://hess.copernicus.org/articles/26/647/2022/). 
+
+### Survey 
+
+Thank you for attending the beginner track tutorial at the Open Climate Data Science Workshop. Please complete the voluntary feedback survey, linked [here](https://docs.google.com/forms/d/e/1FAIpQLSejTJjhvCLbCVKBotUa8VtDzYJBnMCilzPrB4VBzJrs7vXqIQ/viewform). The main purposes of this survey is to (1) determine we met specified teaching goals and (2) improve teaching materials for subsequent tutorial sessions.
 
 
 
