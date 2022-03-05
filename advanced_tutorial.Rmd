@@ -122,7 +122,7 @@ df
 
 
 
-### Content from beg. lectures for time being 
+### PCA from Econet Data 
 
 ```{r}
 
@@ -168,11 +168,11 @@ ggplot(cardinal,aes(x=date,y=AvgT))+geom_line()+labs(title="Total Daily Rainfall
 
 ## Testing and training data
 
-- concept of seeing how well a model works 
+- How can we see how well a model works? 
 
-- *cut to nice images of cross-validation?*
+![Cross Validation Concept](images/CrossValidation.png)
 
-### TIme Series forecasting
+### Time Series forecasting
 
 
 - We were thinking of using logistic regression  but may not?
