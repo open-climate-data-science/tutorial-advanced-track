@@ -53,9 +53,27 @@ Mr. Wuf works for Mount Mitchell State Park in Burnsville, NC and was recently a
 ### nClimgrid Data Set
 
 ```{r}
+
+## Read in data from AWS nClimGrid
 nclim<-read_csv('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/decadal/2020-2021-ste-decadal.csv')%>%drop_na()
 
 ```
+
+```{r}
+## inspect data 
+
+view(nclim)
+ggpolt(nclim,aes(x=date,y=TMIN))+geom_point(colour="green")
+```
+
+## EDA
+
+
+```{r}
+ggplot(nclim,aes(x=TAVG,y=PRCP))+geom_point()
+```
+
+
 
 ## Machine Learning 
 
