@@ -69,8 +69,8 @@ nclim<-read_csv('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/decad
 head(nclim)
 
 
-colnames(nclim)[8:10]<-colnames(nclim)[8:10]%>%tolower()%>% paste0("_degf")
-colnames(nclim)[7]<-colnames(nclim)[7]%>%tolower()%>% paste0("_in")
+colnames(nclim)[8:10]<-colnames(nclim)[8:10]%>%tolower()%>% paste0("_degc")
+colnames(nclim)[7]<-colnames(nclim)[7]%>%tolower()%>% paste0("_cm")
 
 head(nclim)
 ```
@@ -79,9 +79,9 @@ head(nclim)
 - We will inspect the data through a couple graphs as well as a simple linear regression
 
 ```{r}
-# scatterplot of 
-ggpolt(nclim,aes(x=date,y=tavg))+geom_point(colour="green")
-ggplot(nclim,aes(x=date,y=PRCP))+geom_point()
+# scatterplot of tempurature vs time
+ggplot(nclim,aes(x=date,y=tavg_degf))+geom_point(colour="blue")+labs(x = "Date", y = "Average Tempurature (C)",title ="Tempurature Over Time")
+
 ```
 
 
