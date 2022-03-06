@@ -30,6 +30,7 @@ library(tidymodels)
 
 ## allows us to read in large amounts of data
 library(data.table)
+
 ```
 
 # OCDS Advanced Track Tutorial{.tabset}
@@ -76,6 +77,7 @@ nclim_2010s<-fread('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/de
 ```{r}
 #If computation time takes a while ... we have   a .Rda file 
 load("NCLIM2010.Rda")
+load("NCLIM2020.Rda")
 ```
 
 
@@ -146,8 +148,25 @@ head(nclimf)
 
 ## Cleaning for nclimk
 
+Below we do the same cleaning and data preparation that we did for nclim, with the exclusion of the ifNC variable. This is because we will be looking at all of the data
+
 ```{r}
-### bwlow we do the same clean 
+### below we do the same cleaning for nlcimk 
+#apply the ufnction CtoF with tidyverse
+nclimk[8:10]<- nclimk[8:10]%>% lapply(CtoF)
+
+## Apply Tidyverse piping to easily add degree labels  to the end of certain coloumns for temp
+## and to add units for precipitation
+colnames(nclimk)[8:10]<-colnames(nclimk)[8:10]%>%tolower()%>% paste0("_degf")
+colnames(nclimk)[7]<-colnames(nclimk)[7]%>%tolower()%>% paste0("_cm")
+
+nclimk <- nclimk %>% select(date,prcp_cm,tavg_degf,tmin_degf,tmax_degf)%>%
+                    mutate(ifRain= as.factor(as.integer(prcp_cm>0)))
+                           
+                           
+#viewing the data for k-means
+head(nclimk)
+
 ```
 
 
