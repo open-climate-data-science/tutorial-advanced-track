@@ -94,6 +94,7 @@ plotOtemp
 ```{r}
 plotOtemp+geom_smooth(method="lm",se=TRUE,col = "black")+theme_classic()
 ```
+
 ### Time Series ?
 
 
@@ -316,7 +317,6 @@ Any Questions?
 
 Thank you for attending the beginner track tutorial at the Open Climate Data Science Workshop. Please complete the voluntary feedback survey, linked [here](https://docs.google.com/forms/d/e/1FAIpQLSejTJjhvCLbCVKBotUa8VtDzYJBnMCilzPrB4VBzJrs7vXqIQ/viewform). The main purposes of this survey is to (1) determine we met specified teaching goals and (2) improve teaching materials for subsequent tutorial sessions.
 
-### Closing 
 
 
 
