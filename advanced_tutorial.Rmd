@@ -216,14 +216,30 @@ temp_ts<-xts(nclimf$tavg_degf,nclim$date)
 
 ```{r}
 # train/validation split
-train_date <- nrow(temp_ts) *0.8
-train <- temp_ts[1:train_date,]
-test <- temp_ts[-c(1:train_date),]
+train_date <- nclimf$date[round(nrow(temp_ts) *0.7)]
+train <- temp_ts[index(temp_ts) <= train_date]
+test <- temp_ts[index(temp_ts) > train_date]
 ```
 
 ```{r}
-#plot the time series object we called temp_ts
+# plot the time series object we called temp_ts
 plot(temp_ts)
+```
+
+```{r}
+# build the time series model
+model_ts <- auto.arima(as.vector(train))
+```
+
+```{r}
+# plot validation data with forecast on top of plot
+forecast <- forecast(model_ts, h=length(test))
+forecast_dates <- seq(train_date, length = length(test), by="day")
+
+forecast_xts <- xts(forecast$mean, order.by=forecast_dates)
+
+plot(test, main = 'Forecast Comparison')
+lines(forecast_xts, col="blue")
 ```
 
 
