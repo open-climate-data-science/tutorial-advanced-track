@@ -329,8 +329,9 @@ write_csv(x = coop_tempmax_optimal_cluster_data, file = here::here("data", "clus
 
 
 
+## Bonus (for time) Content!
 
-### PCA from Econet Data 
+### PCA from ECOnet Data 
 
 ```{r}
 
@@ -362,7 +363,7 @@ cardinal$IfRain<-as.factor(as.integer(cardinal$IfRain))
 
 ```
 
-### Basic Plotting with Ggplot 
+### Basic Plotting with GGplot 
 
 
 ```{r}
@@ -372,48 +373,6 @@ ggplot(cardinal,aes(x=date,y=AvgT))+geom_line()+labs(title="Total Daily Rainfall
 - EDA is how we can motivate future ML models!
 
 - We can use forecasting to extend this trend!
-
-
-## Testing and training data
-
-- How can we see how well a model works? 
-
-![Cross Validation Concept](images/CrossValidation.png)
-
-### Time Series forecasting
-
-
-- We were thinking of using logistic regression  but may not?
-
-```{r}
-#logistic regression
-fit1 = glm(IfRain~date+AvgT+AvgLw+AvgSt+AvgSr, data=cardinal, family="binomial")
-summary(fit1)
-
-#predict something with logistic regression
-
-```
-
-
-
-
-```{r}
-
-# n climate  grid data
-
-temp_ts <- xts(cardinal$AvgT,cardinal$date)
-head(temp_ts)
-  
-autoplot(temp_ts[1:600])
-
-half_temp <-temp_ts[1:600]
-
-library(forecast)
-d.arima <- auto.arima(half_temp)
-d.forecast <- forecast(d.arima, level = c(90), h = 200)
-autoplot(d.forecast)
-
-```
 
 
 ### PCA to cluster rain variable 
