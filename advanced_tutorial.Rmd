@@ -74,10 +74,28 @@ nclim_2010s<-fread('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/de
 ```
 
 ```{r}
+#If computation time takes a while ... we have   a .Rda file 
+load("NCLIM2010.Rda")
+```
+
+
+
+```{r}
 ## Lets quickly combind the data sets to get a data set ranging from the above
 ## lets also filter for data record that pertain to North Carolina
 nclim <- rbind(nclim_2020s,nclim_2010s)%>%filter(state == c("North Carolina", "South Carolina"))
 ```
+
+
+```{r}
+## Using the whole data set, subset values to only look at the years 2019 to 2020
+## We will be using this data set for k-means clustering later
+## Call the data set nclimk 
+## This data set will have 34 thousand objects
+
+nclimk<-rbind(nclim_2020s,nclim_2010s)%>%filter(date > "2019-01-01" & date <"2020-12-31")
+```
+
 
 
 Using the formula $(C × \frac{9}{5}) + 32=F$, covert the temperature to Fahrenheit. 
@@ -126,6 +144,11 @@ nclimf <- nclim %>% select(date,prcp_cm,tavg_degf,tmin_degf,tmax_degf,state)%>%
 head(nclimf)
 ```
 
+## Cleaning for nclimk
+
+```{r}
+### bwlow we do the same clean 
+```
 
 
 
