@@ -26,6 +26,10 @@ library(broom)
 #other packages for kmeans
 library(here)
 library(tidymodels)
+
+
+## allows us to read in large amounts of data
+library(data.table)
 ```
 
 # OCDS Advanced Track Tutorial{.tabset}
@@ -58,10 +62,23 @@ Mr. Wuf works for Mount Mitchell State Park in Burnsville, NC and was recently a
 
 ```{r}
 
-## Read in data from AWS nClimGrid
-nclim<-read_csv('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/decadal/2020-2021-ste-decadal.csv')%>%drop_na()
+## Read in data from AWS nClimGrid 2020-2021
+nclim_2020s<-read_csv('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/decadal/2020-2021-ste-decadal.csv')%>%drop_na()
+```
+
+```{r}
+
+## Read in nClimGrid 2010-2019
+nclim_2010s<-fread('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/decadal/2010-2019-ste-decadal.csv')%>%drop_na()
 
 ```
+
+```{r}
+## Lets quickly combind the data sets to get a data set ranging from the above
+## lets also filter for data record that pertain to North Carolina
+nclim <- rbind(nclim_2020s,nclim_2010s)%>%filter(state = c("North Carolina", "South Carolina"))
+```
+
 
 Using the formula $(C × \frac{9}{5}) + 32=F$, covert the temperature to Fahrenheit. 
 
@@ -77,7 +94,7 @@ CtoF<- function(datcols){
 ## Applying functions Basics
 
 ```{r}
-
+#apply the ufnction CtoF with tidyverse
 nclim[8:10]<- nclim[8:10]%>% lapply(CtoF)
 head(nclim)
 ```
@@ -88,7 +105,7 @@ head(nclim)
 
 ```{r}
 ## Apply Tidyverse piping to easily add degree labels  to the end of certain coloumns for temp
-## and to add units for percipitation
+## and to add units for precipitation
 colnames(nclim)[8:10]<-colnames(nclim)[8:10]%>%tolower()%>% paste0("_degf")
 colnames(nclim)[7]<-colnames(nclim)[7]%>%tolower()%>% paste0("_cm")
 
@@ -182,9 +199,9 @@ calculate_cluster <- function(data, k) {
 
 
 ```{r}
-plot(nclim$date,nclim$TAVG)
+plot(nclimf$date,nclimf$tavg_degf)
 
-data2cluster<-data.frame(nclim$PRCP, nclim$TAVG)
+data2cluster<-data.frame(nclimf$date,nclimf$tavg_deg)
 
 df<-calculate_cluster(data2cluster,4)
 df
