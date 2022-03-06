@@ -39,7 +39,7 @@ We will be tackling these objectives:
 
 - *Define* open data and reproducible science
 - *Recognize* the importance of statistical analysis for climate data analysis using cloud based data
-- *Apply* techniques to access and explore publicly available climate data from the cloud using exploratory data analysis
+- *Apply* techniques to access and explore publicly available climate data from the cloud using exploratory data analysis (i.e. tidyverse)
 - *Create* a machine learning model to predicts results for a representative case study
 
 ### Meet Mr. Wuf!
