@@ -44,7 +44,7 @@ We will be tackling these objectives:
 
 ### Meet Mr. Wuf!
 
-Mr. Wuf works for Mount Mitchell State Park in Burnsville, NC and was recently asked by his boss to write a report summarizing rainfall and temperature data for 2021. This report will be used to help optimize 2022 event planning (e.g., fall color viewing) for park visitors and maintenance scheduling for park staff. Mr. Wuf’s wife, Mrs. Wuf, recently told him about the State Climate Office of North Carolina’s new Cardinal and Station Scout data portals. He agrees with her that it would be a great opportunity to check out these new, free tools. After some preliminary sleuthing around Station Scout, he discovered there was a National Weather Service Cooperative Observer Program (COOP; https://www.weather.gov/rah/coop) station on park property (station # 315923). How did he miss this? Once he downloads these data from Cardinal, Mr. Wuf plans to put the skills he learned in an online R programming course to the test for this real-world, work-related project.\
+Mr. Wuf works for Mount Mitchell State Park in Burnsville, NC and was recently asked by his boss to write a report summarizing rainfall and temperature data for 2021. This report will be used to help optimize 2022 event planning (e.g., fall color viewing) for park visitors and maintenance scheduling for park staff. He recently got promoted to the head office of the NC State Climate office! Mr. Wuf’s wife, Mrs. Wuf, recently told him about the State Climate Office of North Carolina’s new nClimgrid and Econet data portals. He agrees with her that it would be a great opportunity to check out these new, free tools. After some preliminary sleuthing around nClimgrid, he discovered there was a Monthly U.S Climate Gridded Dataset (nClimGrid; https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00332). How did he miss this? Once he downloads these data from nClimGrid and Econet, Mr. Wuf plans to put the skills he learned in an online R programming course to the test for this real-world, work-related project.\
 
 ## API 
 
@@ -130,13 +130,19 @@ plotOtemp
 
 ### Simple Regression 
 
+- 
+
 ```{r}
 plotOtemp+geom_smooth(method="lm",se=TRUE,col = "black")+theme_classic()
 ```
 
 ### Time Series 
 
-**Blurb on time series** 
+- A time series is a collection of observations of well-defined data items obtained through repeated measurements over time
+
+- Time series analyze a sequence of data points collected over an interval of times
+
+- We will now try to fit a time series model to this data rather than a regression to see if the results improve
 
 
 ```{r}
