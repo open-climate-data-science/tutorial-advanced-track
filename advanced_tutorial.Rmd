@@ -76,7 +76,7 @@ nclim_2010s<-fread('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/de
 ```{r}
 ## Lets quickly combind the data sets to get a data set ranging from the above
 ## lets also filter for data record that pertain to North Carolina
-nclim <- rbind(nclim_2020s,nclim_2010s)%>%filter(state = c("North Carolina", "South Carolina"))
+nclim <- rbind(nclim_2020s,nclim_2010s)%>%filter(state == c("North Carolina", "South Carolina"))
 ```
 
 
@@ -117,8 +117,10 @@ head(nclim)
 ## Further Create the variable ifRain: a factor to indicate wether it rained on a certain day
 ## Call this final data set nclimf
 
-nclimf <- nclim %>% select(date,prcp_cm,tavg_degf,tmin_degf,tmax_degf)%>%
-                    mutate(ifRain= as.factor(as.integer(prcp_cm>0)))
+nclimf <- nclim %>% select(date,prcp_cm,tavg_degf,tmin_degf,tmax_degf,state)%>%
+                    mutate(ifNC=as.factor(as.integer(state=="North Carolina")))%>%
+                    mutate(ifRain= as.factor(as.integer(prcp_cm>0)))%>%
+                    select(-state)
                            
                            
 head(nclimf)
