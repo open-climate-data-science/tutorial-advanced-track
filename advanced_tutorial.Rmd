@@ -96,7 +96,7 @@ nclim <- rbind(nclim_2020s,nclim_2010s)%>%filter(state == c("North Carolina", "S
 ## Call the data set nclimk 
 ## This data set will have 34 thousand objects
 
-nclimk<-rbind(nclim_2020s,nclim_2010s)%>%filter(date >= "2020-01-01" & date <="2020-12-31")
+nclimk<-rbind(nclim_2020s,nclim_2010s)%>%filter(date >= "2020-01-01" & date <="2020-12-31")%>%filter(state == c("North Carolina", "South Carolina"))
 ```
 
 
@@ -160,6 +160,7 @@ colnames(nclimk)[7]<-colnames(nclimk)[7]%>%tolower()%>% paste0("_cm")
 
 nclimk <- nclimk %>% select(date,prcp_cm,tavg_degf,tmin_degf,tmax_degf)%>%
                     mutate(ifRain= as.factor(as.integer(prcp_cm>0)))
+                    
                            
                            
 #viewing the data for k-means
@@ -294,61 +295,69 @@ nclimk_tocluster <- nclimk %>%
     select(doy, tavg_degf, prcp_cm) %>%
     na.omit()
   
-  # test function
-  # calculate_cluster(data = coop_data_small, k = 2)
+```
+
+```{r}
   
   # map cluster calculations function to range of k values
   temp_cluster_data <- tibble(k = 2:12) %>%
-    mutate(kclust = map(k, ~calculate_cluster(temp_coop_data, .x))) %>%
+    mutate(kclust = map(k, ~calculate_cluster(nclimk_tocluster, .x))) %>%
     unnest(cols = c(kclust))
   
 
-  
+```
+
+```{r}
   # calculate silhoutte score (highest for optimal number of k clusters)
   temp_sil_score_data <- temp_cluster_data %>%
     group_by(k) %>%
     summarize(avg_sil_score = mean(silhouette, na.rm = TRUE))
   
+```
+
+```{r}
   # find maximum
   temp_optimal_sil_score_data <- temp_sil_score_data %>%
     filter(max(avg_sil_score, na.rm = TRUE) == avg_sil_score)
   
   # save optimal k
   temp_optimal_k_value <- temp_optimal_sil_score_data$k
+
   
-  # print status
-  print(paste0("optimal number of clusters was k = ", temp_optimal_k_value))
+```
+ 
+```{r}
+  
   
   # save optimal k cluster data
   temp_cluster_data_sel <- temp_cluster_data %>%
-    filter(k == temp_optimal_k_value) %>%
-    mutate(station = temp_station)
+    filter(k == temp_optimal_k_value)
   
   # append data
-  coop_tempmax_optimal_cluster_data <- bind_rows(temp_cluster_data_sel)
+  nclimk_optimal_cluster <- bind_rows(temp_cluster_data_sel)
   
 
+```
 
-# quick look
-length(unique(coop_tempmax_optimal_cluster_data$station))
-unique(coop_tempmax_optimal_cluster_data$k)
-# optimal k is always 3
+```{r}
 
+unique(nclimk_optimal_cluster$k)
+
+
+```
+
+```{r}
 # plot outputs tempmax vs doy
-ggplot(data = coop_tempmax_optimal_cluster_data) +
-  geom_point(aes(x = doy, y = tempmax_c, color = .cluster), alpha = 0.5) + 
-  facet_wrap(~ station) +
+ggplot(data = nclimk_optimal_cluster) +
+  geom_point(aes(x = doy, y = tavg_degf, color = .cluster), alpha = 0.5) + 
   labs(x = "Day of Year", y = "Max. Air Temperature (C)", color = "Cluster ID")
 
 # plot outputs density of doy colored by cluster
-ggplot(data = coop_tempmax_optimal_cluster_data) +
+ggplot(data = nclimk_optimal_cluster) +
   geom_density(aes(x = doy, fill = .cluster), alpha = 0.5) + 
-  facet_wrap(~ station, scale = "free") +
   labs(x = "Day of Year", y = "Density", fill = "Cluster ID") +
   theme_classic()
 
-# export
-write_csv(x = coop_tempmax_optimal_cluster_data, file = here::here("data", "cluster_data", "coop_tempmax_optimal_cluster_data.csv"))
 
 ```
 
