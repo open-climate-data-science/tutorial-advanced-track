@@ -96,7 +96,7 @@ nclim <- rbind(nclim_2020s,nclim_2010s)%>%filter(state == c("North Carolina", "S
 ## Call the data set nclimk 
 ## This data set will have 34 thousand objects
 
-nclimk<-rbind(nclim_2020s,nclim_2010s)%>%filter(date > "2019-01-01" & date <"2020-12-31")
+nclimk<-rbind(nclim_2020s,nclim_2010s)%>%filter(date >= "2020-01-01" & date <="2020-12-31")
 ```
 
 
@@ -250,23 +250,23 @@ calculate_cluster <- function(data, k) {
 
 
 ```{r}
-plot(nclimf$date,nclimf$tavg_degf)
+plot(nclimk$date,nclimk$tavg_degf)
 
-data2cluster<-data.frame(nclimf$date,nclimf$tavg_deg)
+data2cluster<-data.frame(as.numeric(nclimk$date),nclimk$tavg_degf)
 
 df<-calculate_cluster(data2cluster,4)
-df
+
+
+head(df)
 ```
 
 
 ```{r}
 
   # data subset
-  temp_coop_data <- coop_data %>%
-    select(station, date, tempmax_c) %>%
+nclimk_tocluster <- nclimk %>%
     mutate(doy = yday(date)) %>%
-    filter(station == temp_station) %>% # select one station for now
-    select(doy, tempmax_c) %>%
+    select(doy, tavg_degf, prcp_cm) %>%
     na.omit()
   
   # test function
