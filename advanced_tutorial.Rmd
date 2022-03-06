@@ -203,7 +203,7 @@ plotOtemp+geom_smooth(method="lm",se=TRUE,col = "black")+theme_classic()
 
 - Time series analyze a sequence of data points collected over an interval of times
 
-- We will now try to fit a time series model to this data rather than a regression to see if the results improve
+- We will now try to fit a time series model to this data rather than a regression to see if the results improve. We will create a time series forecast with ARIMA (Auto Regressive Integrated Moving Average).
 
 
 ```{r}
@@ -211,6 +211,15 @@ plotOtemp+geom_smooth(method="lm",se=TRUE,col = "black")+theme_classic()
 ## with the variables date and avergae tempurature, create a time series object. 
 ## save as temp_ts
 temp_ts<-xts(nclimf$tavg_degf,nclim$date)
+
+#extract the index of temp object
+temp_index <- index(temp_ts)
+
+# view class of the index 
+class(temp_index)
+
+# train/validation split
+train <- temp_ts[index(temp_ts <= )]
 ```
 
 
