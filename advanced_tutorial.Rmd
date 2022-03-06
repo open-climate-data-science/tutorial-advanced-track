@@ -121,9 +121,6 @@ head(nclim)
 ```
 
 
-
-
-
 ```{r}
 ## Apply Tidyverse piping to easily add degree labels  to the end of certain coloumns for temp
 ## and to add units for precipitation
@@ -206,13 +203,15 @@ plotOtemp+geom_smooth(method="lm",se=TRUE,col = "black")+theme_classic()
 
 - We will now try to fit a time series model to this data rather than a regression to see if the results improve. We will create a time series forecast with ARIMA (Auto Regressive Integrated Moving Average).
 
-
+- First we begin by creating an xts object
 ```{r}
 
 ## with the variables date and average temperature, create a time series object. 
 ## save as temp_ts
 temp_ts<-xts(nclimf$tavg_degf,nclim$date)
 ```
+
+- Now we will split the data into a training and testing set. Majority of the data will be in the training set.
 
 ```{r}
 # train/validation split
@@ -221,15 +220,21 @@ train <- temp_ts[index(temp_ts) <= train_date]
 test <- temp_ts[index(temp_ts) > train_date]
 ```
 
+- Next we plot the time series object we created to take a closer look at the data
+
 ```{r}
 # plot the time series object we called temp_ts
-plot(temp_ts)
+plot(temp_t)
 ```
+
+- Time to build the model!
 
 ```{r}
 # build the time series model
 model_ts <- auto.arima(as.vector(train))
 ```
+
+- Once the model has been created, we will use that to create a forecasting xts object
 
 ```{r}
 # plot validation data with forecast on top of plot
@@ -237,7 +242,11 @@ forecast <- forecast(model_ts, h=length(test))
 forecast_dates <- seq(train_date, length = length(test), by="day")
 
 forecast_xts <- xts(forecast$mean, order.by=forecast_dates)
+```
 
+- Finally we plot the validation (testing) data and layer the forecast on top for our time series model
+
+```{r}
 plot(test, main = 'Forecast Comparison')
 lines(forecast_xts, col="blue")
 ```
