@@ -18,6 +18,7 @@ library(rnoaa)
 library(forecast)
 #install.packages("xts")                      # Install & load xts package
 library("xts")
+library(TSstudio)
 
 library(ClusterR)
 library(cluster)
@@ -189,20 +190,17 @@ plotOtemp+geom_smooth(method="lm",se=TRUE,col = "black")+theme_classic()
 
 ```{r}
 
-## with the variables date and avergae tempurature, create a time series object. 
+## with the variables date and average temperature, create a time series object. 
 ## save as temp_ts
 temp_ts<-xts(nclimf$tavg_degf,nclim$date)
-
-#extract the index of temp object
-temp_index <- index(temp_ts)
-
-# view class of the index 
-class(temp_index)
-
-# train/validation split
-train <- temp_ts[index(temp_ts <= )]
 ```
 
+```{r}
+# train/validation split
+train_date <- nrow(temp_ts) *0.8
+train <- temp_ts[1:train_date,]
+test <- temp_ts[-c(1:train_date),]
+```
 
 ```{r}
 #plot the time series object we called temp_ts
