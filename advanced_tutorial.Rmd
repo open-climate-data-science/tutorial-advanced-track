@@ -63,24 +63,63 @@ nclim<-read_csv('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/decad
 
 ```
 
+Using the formula $(C × \frac{9}{5}) + 32=F$, covert the temperature to Fahrenheit. 
+
+
+
 ```{r}
-## inspect data 
+CtoF<- function(datcols){
+  x<- (9/5)*datcols+32
+  return(x)
+}
+```
 
+## Applying functions Basics
+
+```{r}
+
+nclim[8:10]<- nclim[8:10]%>% lapply(CtoF)
 head(nclim)
+```
 
 
-colnames(nclim)[8:10]<-colnames(nclim)[8:10]%>%tolower()%>% paste0("_degc")
+
+
+
+```{r}
+## Apply Tidyverse piping to easily add degree labels  to the end of certain coloumns for temp
+## and to add units for percipitation
+colnames(nclim)[8:10]<-colnames(nclim)[8:10]%>%tolower()%>% paste0("_degf")
 colnames(nclim)[7]<-colnames(nclim)[7]%>%tolower()%>% paste0("_cm")
 
 head(nclim)
 ```
 
+```{r}
+## Keep the weather data coloumns as well as the date, drop all other coloumns 
+## Further Create the variable ifRain: a factor to indicate wether it rained on a certain day
+## Call this final data set nclimf
+
+nclimf <- nclim %>% select(date,prcp_cm,tavg_degf,tmin_degf,tmax_degf)%>%
+                    mutate(ifRain= as.factor(as.integer(prcp_cm>0)))
+                           
+                           
+head(nclimf)
+```
+
+
+
+
 ## EDA
+
+
 - We will inspect the data through a couple graphs as well as a simple linear regression
 
 ```{r}
-# scatterplot of tempurature vs time
-plotOtemp<-ggplot(nclim,aes(x=date,y=tavg_degf))+geom_point(colour="red")+labs(x = "Date", y = "Average Tempurature (C)",title ="Tempurature Over Time")
+# scatterplot of avg tempurature vs time, color the points red
+## add labels
+## save the plot at plotOTemp
+plotOtemp<-ggplot(nclim,aes(x=date,y=tavg_degf))+geom_point(colour="red")+labs(x = "Date", y = "Average Tempurature (F)",title ="Tempurature Over Time")
 plotOtemp
 ```
 
@@ -95,7 +134,24 @@ plotOtemp
 plotOtemp+geom_smooth(method="lm",se=TRUE,col = "black")+theme_classic()
 ```
 
-### Time Series ?
+### Time Series 
+
+**Blurb on time series** 
+
+
+```{r}
+
+## with the variables date and avergae tempurature, create a time series object. 
+## save as temp_ts
+temp_ts<-xts(nclimf$tavg_degf,nclim$date)
+```
+
+
+```{r}
+#plot the time series object we called temp_ts
+plot(temp_ts)
+```
+
 
 
 
@@ -120,7 +176,7 @@ calculate_cluster <- function(data, k) {
 
 
 ```{r}
-plot(nclim$PRCP,nclim$TAVG)
+plot(nclim$date,nclim$TAVG)
 
 data2cluster<-data.frame(nclim$PRCP, nclim$TAVG)
 
