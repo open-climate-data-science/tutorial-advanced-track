@@ -292,9 +292,11 @@ head(df)
   # data subset
 nclimk_tocluster <- nclimk %>%
     mutate(doy = yday(date)) %>%
-    select(doy, tavg_degf, prcp_cm) %>%
+    select(doy, tavg_degf) %>%
     na.omit()
   
+head(nclimk_tocluster)
+
 ```
 
 ```{r}
@@ -304,7 +306,8 @@ nclimk_tocluster <- nclimk %>%
     mutate(kclust = map(k, ~calculate_cluster(nclimk_tocluster, .x))) %>%
     unnest(cols = c(kclust))
   
-
+head(temp_cluster_data)
+str(temp_cluster_data)
 ```
 
 ```{r}
@@ -312,7 +315,7 @@ nclimk_tocluster <- nclimk %>%
   temp_sil_score_data <- temp_cluster_data %>%
     group_by(k) %>%
     summarize(avg_sil_score = mean(silhouette, na.rm = TRUE))
-  
+ head( temp_sil_score_data) 
 ```
 
 ```{r}
@@ -323,7 +326,8 @@ nclimk_tocluster <- nclimk %>%
   # save optimal k
   temp_optimal_k_value <- temp_optimal_sil_score_data$k
 
-  
+  temp_optimal_k_value
+#3
 ```
  
 ```{r}
@@ -335,7 +339,7 @@ nclimk_tocluster <- nclimk %>%
   
   # append data
   nclimk_optimal_cluster <- bind_rows(temp_cluster_data_sel)
-  
+  nclimk_optimal_cluster
 
 ```
 
@@ -352,6 +356,11 @@ ggplot(data = nclimk_optimal_cluster) +
   geom_point(aes(x = doy, y = tavg_degf, color = .cluster), alpha = 0.5) + 
   labs(x = "Day of Year", y = "Max. Air Temperature (C)", color = "Cluster ID")
 
+```
+
+
+
+```{r}
 # plot outputs density of doy colored by cluster
 ggplot(data = nclimk_optimal_cluster) +
   geom_density(aes(x = doy, fill = .cluster), alpha = 0.5) + 
