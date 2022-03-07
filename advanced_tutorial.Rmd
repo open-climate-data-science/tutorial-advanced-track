@@ -241,6 +241,7 @@ plot(temp_ts)
 ```{r}
 # build the time series model
 model_ts <- auto.arima(as.vector(train))
+model_ts
 ```
 
 - Once the model has been created, we will use that to create a forecasting xts object
