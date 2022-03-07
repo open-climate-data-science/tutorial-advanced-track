@@ -168,8 +168,11 @@ Below we do the same cleaning and data preparation that we did for nclim. We not
 ```{r}
 ### below we do the same cleaning for nlcimk 
 #apply the ufnction CtoF with tidyverse
+
+state2consider="NJ" 
+
 nclimk_last <- nclimk_raw%>%
-               filter(state=="NC")%>%
+               filter(state==state2consider)%>%
                select(-c(state,month,region_code,year,day))
 
 #applying function CtoF
@@ -261,23 +264,23 @@ model_ts
 
 ```{r}
 # plot validation data with forecast on top of plot
-forecast <- forecast(model_ts, h=length(test))
-forecast_dates <- seq(train_date, length = length(test), by="day")
+#forecast <- forecast(model_ts, h=length(test))
+#forecast_dates <- seq(train_date, length = length(test), by="day")
 
-forecast_xts <- xts(forecast$fitted, order.by=forecast_dates)
+#forecast_xts <- xts(forecast$fitted, order.by=forecast_dates)
 ```
 
 - Finally we plot the validation (testing) data and layer the forecast on top for our time series model
 
 ```{r}
-plot(test, main = 'Forecast Comparison')
-lines(forecast_xts, col="blue")
+#plot(test, main = 'Forecast Comparison')
+#lines(forecast_xts, col="blue")
 ```
 
 ```{r}
-tbats_test = tbats(as.vector(temp_ts))
-tbats_forecast = forecast(tbats_test, h=length(test))
-plot(tbats_forecast)
+#tbats_test = tbats(as.vector(temp_ts))s
+#tbats_forecast = forecast(tbats_test, h=length(test))
+#plot(tbats_forecast)
 ```
 
 
@@ -449,14 +452,14 @@ getmode <- function(v) {
 
 countyPlot<-ClusterWCounty%>%group_by(county)%>% 
                 summarise(Common_Cluster =mean(as.numeric((.cluster))))%>%
-                mutate(fips=fips(state="NC",county = county))%>%
+                mutate(fips=fips(state=state2consider,county = county))%>%
                 select(-county)
 
 ## if i was to compute the mode
-countyPlot<-ClusterWCounty%>%group_by(county)%>% 
-                summarise(Common_Cluster =getmode(.cluster))%>%
-                mutate(fips=fips(state="NC",county = county))%>%
-                select(-county)
+#countyPlot<-ClusterWCounty%>%group_by(county)%>% 
+#                summarise(Common_Cluster =getmode(.cluster))%>%
+#                mutate(fips=fips(state=state2consider,county = county))%>%
+#                select(-county)
 
  countyPlot<- data.frame(countyPlot)
  head(countyPlot)
@@ -467,7 +470,7 @@ countyPlot<-ClusterWCounty%>%group_by(county)%>%
 
 
 ```{r}
-plot_usmap( data = countyPlot, values = "Common_Cluster", "counties", include = c("NC"), color="black")+labs(title="North Carolina")+  
+plot_usmap( data = countyPlot, values = "Common_Cluster", "counties", include = c(state2consider), color="black")+labs(title=state2consider)+  
   #can comment out the below line if we use the mode method. 
  scale_fill_continuous(low = "#FFCC00", high = "#CC0000", name="Common_Cluster", label=scales::comma)+
     theme(legend.position="right") 
