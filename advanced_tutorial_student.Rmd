@@ -30,9 +30,13 @@ library(broom)
 ## allows us to read in large amounts of data
 library(data.table)
 
+
+## Optional PCA
+library(corrplot)
+
 ```
 
-# OCDS Advanced Track Tutorial{.tabset}
+# OCDS Advanced Track Tutorial Student Version{.tabset}
 
 
 ## Tutorial Learning Goals
@@ -65,20 +69,19 @@ Mr. Wuf works for Mount Mitchell State Park in Burnsville, NC and was recently a
 ```{r}
 
 ## Read in data from AWS nClimGrid 2020-2021
-nclim_2020s<-read_csv('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/decadal/2020-2021-ste-decadal.csv')%>%drop_na()
+
 ```
 
 ```{r}
 
 ## Read in nClimGrid 2010-2019
-nclim_2010s<-fread('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/decadal/2010-2019-ste-decadal.csv')%>%drop_na()
+
 
 ```
 
 ```{r}
 #If computation time takes a while ... we have   a .Rda file 
-load("NCLIM2010.Rda")
-load("NCLIM2020.Rda")
+
 ```
 
 ## Functions/Cleaning
@@ -88,17 +91,17 @@ load("NCLIM2020.Rda")
 ```{r}
 ## Lets quickly combind the data sets to get a data set ranging from the above
 ## lets also filter for data record that pertain to North Carolina
-nclim <- rbind(nclim_2020s,nclim_2010s)%>%filter(state == c("North Carolina", "South Carolina"))
+
 ```
 
 
 ```{r}
-## Using the whole data set, subset values to only look at the years 2019 to 2020
+## Using the whole data set, subset values to only look at the years 2020
 ## We will be using this data set for k-means clustering later
-## Call the data set nclimk 
-## This data set will have 34 thousand objects
+## Call the data set nclimk _raw
+## This data set will have 374 records
 
-nclimk_raw<-nclim_2020s%>%filter(date >= "2020-01-01" & date <="2020-12-31")%>%filter(state == c("North Carolina", "South Carolina"))
+
 ```
 
 ### Functions
@@ -111,10 +114,7 @@ Using the formula $(C \times \frac{9}{5}) + 32=F$, covert the temperature to Fah
 #create a function for basic syntax 
 # convert data value temperature F to C
 # Call it CtoF
-CtoF<- function(datcols){
-  x<- (9/5)*datcols+32
-  return(x)
-}
+
 ```
 
 We now will need to apply this function to the temperature columns. 
@@ -122,9 +122,7 @@ We now will need to apply this function to the temperature columns.
 ```{r}
 #apply the fucntion  CtoF with tidyverse functions 
 # to the coloumns relating to tempurature
-colnames(nclim)
-nclim[8:10]<- nclim[8:10]%>% lapply(CtoF)
-head(nclim)
+
 ```
 
 ### Cleaning
@@ -132,10 +130,7 @@ head(nclim)
 ```{r}
 ## Apply Tidyverse piping to easily add degree labels  to the end of certain coloumns for temp
 ## and to add units for precipitation
-colnames(nclim)[8:10]<-colnames(nclim)[8:10]%>%tolower()%>% paste0("_degf")
-colnames(nclim)[7]<-colnames(nclim)[7]%>%tolower()%>% paste0("_cm")
 
-head(nclim)
 ```
 
 ```{r}
@@ -143,13 +138,6 @@ head(nclim)
 ## Further Create the variable ifRain: a factor to indicate wether it rained on a certain day
 ## Call this final data set nclimf
 
-nclimf <- nclim %>% select(date,prcp_cm,tavg_degf,tmin_degf,tmax_degf,state)%>%
-                    mutate(ifNC=as.factor(as.integer(state=="North Carolina")))%>%
-                    mutate(ifRain= as.factor(as.integer(prcp_cm>0)))%>%
-                    select(-state)
-                           
-                           
-head(nclimf)
 ```
 
 ### Cleaning for nclimk
@@ -187,8 +175,7 @@ head(nclimk)
 # scatterplot of avg tempurature vs time, color the points red
 ## add labels
 ## save the plot at plotOTemp
-plotOtemp<-ggplot(nclim,aes(x=date,y=tavg_degf))+geom_point(colour="red")+labs(x = "Date", y = "Average Tempurature (F)",title ="Tempurature Over Time")
-plotOtemp
+
 ```
 
 
@@ -201,7 +188,7 @@ plotOtemp
 - *Text Blurb*
 
 ```{r}
-plotOtemp+geom_smooth(method="lm",se=TRUE,col = "black")+theme_classic()
+
 ```
 
 ### Time Series Analysis
@@ -217,47 +204,43 @@ plotOtemp+geom_smooth(method="lm",se=TRUE,col = "black")+theme_classic()
 
 ## with the variables date and average temperature, create a time series object. 
 ## save as temp_ts
-temp_ts<-xts(nclimf$tavg_degf,nclim$date)
+
 ```
 
 - Now we will split the data into a training and testing set. Majority of the data will be in the training set.
 
 ```{r}
 # train/validation split
-train_date <- nclimf$date[round(nrow(temp_ts) *0.7)]
-train <- temp_ts[index(temp_ts) <= train_date]
-test <- temp_ts[index(temp_ts) > train_date]
+
 ```
 
 - Next we plot the time series object we created to take a closer look at the data
 
 ```{r}
 # plot the time series object we called temp_ts
-plot(temp_ts)
+
 ```
 
 ### Time to build the model!
 
 ```{r}
 # build the time series model
-model_ts <- auto.arima(as.vector(train))
+
 ```
 
 - Once the model has been created, we will use that to create a forecasting xts object
 
 ```{r}
 # plot validation data with forecast on top of plot
-forecast <- forecast(model_ts, h=length(test))
-forecast_dates <- seq(train_date, length = length(test), by="day")
 
-forecast_xts <- xts(forecast$mean, order.by=forecast_dates)
 ```
 
 - Finally we plot the validation (testing) data and layer the forecast on top for our time series model
 
 ```{r}
-plot(test, main = 'Forecast Comparison')
-lines(forecast_xts, col="blue")
+# plot the testing / validation data 
+# overlay the time series forecast for this testing data
+
 ```
 
 
@@ -273,27 +256,23 @@ lines(forecast_xts, col="blue")
 - `calculate_cluster` is the name of the function we are going to create to compute k-means clusters among other information. 
 
 ```{r}
-calculate_cluster <- function(data, k) {
-  x <- data %>%
-    na.omit() %>%
-    scale()
-  
-  df <- kmeans(x, center = k) %>%
-    augment(data) %>% # creates column ".cluster" with cluster label
-    # makes coloumn called silhouette, uses a cluster function called silhouette
-    mutate(silhouette = cluster::silhouette(as.integer(.cluster), dist(x))[, "sil_width"]) 
-    # calculate silhouette score
-  
-  return(df)
-}
+
+# Our goal is to write a function to compute k-means on a data set
+# It may be helpful to look at help of cluster::silhouette
+  # More specifically we will want to look at the colnames for the output of silhouette 
+# Inputs: data.frame and k number of clusters 
+# We want to clean our data by scaling it
+# our output will be a data frame, we will call df in the function, with an added shilloute score coloumn
+
+
 
 ```
 
 
 ```{r}
 
-##plot to the data of average tempurature w.r.t date
-plot(nclimk$date,nclimk$tavg_degf)
+##plot to the data of average tempurature w.r.t date nclimk
+
 
 ```
 
@@ -301,7 +280,7 @@ plot(nclimk$date,nclimk$tavg_degf)
 ```{r}
 
 # data subset nclimk
-# chnage the date to the day of the year!
+# change the date to the day of the year!
 # select the column of the date and temperature only
 # omit any missing values 
 # inspect data
@@ -321,58 +300,42 @@ head(nclimk_tocluster)
 
 ```{r}
   
-# map cluster calculations function to range of k values
-  temp_cluster_data <- tibble(k = 2:12) %>%
-    mutate(kclust = map(k, ~calculate_cluster(nclimk_tocluster, .x))) %>%
-    unnest(cols = c(kclust))
-  
-head(temp_cluster_data)
-str(temp_cluster_data)
+# using the map function
+# MAP cluster calculations function to range of k values
+# This will help us determine the optimal number of clusters k 
+  # consider a k range from 2 to 12 clusters
+#call this data set temp_cluster_data
+# inspect it
+
+
 ```
 
 ```{r}
-  # calculate average silhoutte score (highest for optimal number of k clusters)
+  # calculate average silhouette score (highest for optimal number of k clusters)
   # for each k value
   # store these values for each value of k as temp_sil_score_data
-  temp_sil_score_data <- temp_cluster_data %>%
-    group_by(k) %>%
-    summarize(avg_sil_score = mean(silhouette, na.rm = TRUE))
- head( temp_sil_score_data) 
+
 ```
 
 ```{r}
-  # find maximum
-  temp_optimal_sil_score_data <- temp_sil_score_data %>%
-    filter(max(avg_sil_score, na.rm = TRUE) == avg_sil_score)
+  # find maximum value for the shil score  from temp_sil_score_data
+  # Call this row of the dataframe temp_optimal_sil_score_data
+ 
   
-  # save optimal k
-  temp_optimal_k_value <- temp_optimal_sil_score_data$k
+  # save optimal k from as temp_optimal_k_value 
 
-  temp_optimal_k_value
-#3
 ```
  
- 
- 
-  
  - Note we could have also used a visual inspection
  
 ```{r}
 # plot the data from temp_sil_score_data and visually inspect to determine the k
 # with the largest sil score
+# Add an additional point to isolate the maximum sil score
 
-ggplot(temp_sil_score_data,aes(k,avg_sil_score))+
-  geom_line()+
-  geom_point()+
-  labs(x="Value of k",y="Mean of Silhouette Score",title="Silhouette Score for Value of k")+
-  geom_point(temp_sil_score_data %>% filter(max(avg_sil_score, na.rm = TRUE)),
-             pch=21,
-             size=4,
-             colour="purple")
 
 
 ```
- 
  
  
  
@@ -380,18 +343,17 @@ ggplot(temp_sil_score_data,aes(k,avg_sil_score))+
   
   
   # save optimal k cluster data as nclimk_optimal_cluster
-  nclimk_optimal_cluster <- temp_cluster_data %>%
-    filter(k == temp_optimal_k_value)
+  # i.e. consider only the instsances where k in optimal 
+
 
 ```
+
 
 
 ```{r}
 # plot outputs tempavg vs doy
 # color each data point by its associated cluster
-ggplot(data = nclimk_optimal_cluster) +
-  geom_point(aes(x = doy, y = tavg_degf, color = .cluster), alpha = 0.5) + 
-  labs(x = "Day of Year", y = "Max. Air Temperature (C)", color = "Cluster ID")
+
 
 ```
 
@@ -399,10 +361,7 @@ ggplot(data = nclimk_optimal_cluster) +
 
 ```{r}
 # plot outputs density of doy colored by cluster
-ggplot(data = nclimk_optimal_cluster) +
-  geom_density(aes(x = doy, fill = .cluster), alpha = 0.5) + 
-  labs(x = "Day of Year", y = "Density", fill = "Cluster ID") +
-  theme_classic()
+
 
 
 ```
@@ -414,6 +373,9 @@ ggplot(data = nclimk_optimal_cluster) +
 ### PCA from ECOnet Data 
 
 ```{r}
+
+# Here we are reading in cardinal data that is provided to us, changing labels 
+# and creating an ifRain Variable
 
 cardinal <- read_csv("cardinal_data.csv", 
      col_types = list(`Average Air Temperature (F)` = col_number(), 
@@ -447,7 +409,9 @@ cardinal$IfRain<-as.factor(as.integer(cardinal$IfRain))
 
 
 ```{r}
-ggplot(cardinal,aes(x=date,y=AvgT))+geom_line()+labs(title="Total Daily Rainfall by Date",y="Average Tempurature (F) ", x= "Date")
+
+## We present EDA for looking at avergae tempurature w.r.t. date
+
 ```
 
 - EDA is how we can motivate future ML models!
@@ -475,45 +439,62 @@ Three general steps:
 Observe: 
 
 ```{r}
-library(corrplot)
-corrplot(cor(cardinal[,-c(1,12)]))
+#using the library corrplot, create a correlation of the numeric
+
+
 ```
 
 - Tells us to remove all but one temperature variable
 
 
 ```{r}
-IfRainVar<- cardinal$IfRain
-cardshort <- cardinal%>%select(-c(date,IfRain,Tprep,MinT,MaxT))
-cardshort
+#Drop all heavily correlated variables from the cardinal date
+#call this data set cardshot
+
+
 ```
 
-- We will now actually conduct PCA on our data
+
+- We will now conduct PCA on our data 
+
 
 ```{r}
-pca_card<- princomp(scale(cardshort,scale=FALSE),cor = FALSE)
+## conduct PCA on the cardshot data set with princomp 
+## call the output pca_card
+## Note we must center the data first and not use a correlation matrix for analysis
+
+
 
 ```
+
+
+
 
 ```{r}
+#plot the scores variable from the pca output 
+# color the plot by the variable IfRainVar
+#add a base R legend
 
-plot(pca_card$scores, pch = 16, col =IfRainVar)
-legend("topright",c("No Rain","Rain"),pch=16,col=c("black","red"))
 
 ```
+
 
 - Here we can look at how good PCA does at describing changes in data 
 
 - We see 2 components describes 96% of the data's variation ! (This is very good)
 
 ```{r}
-summary(pca_card)
+#output the summary of the PCA object
+
 ```
 
 
 
 ```{r}
-screeplot(pca_card, type = "lines")
+#use the screeplot function on pca_card 
+# note we want a plottype with lines
+
+
 ```
 
 
@@ -522,7 +503,8 @@ screeplot(pca_card, type = "lines")
 - Does not print small values, less impactful to correlation 
 
 ```{r}
-loadings(pca_card)
+#print out the loadings from the PCA object
+
 ```
 
 
@@ -538,7 +520,9 @@ We see in PC 1 that there is a high positive correlation between AvgSr. We see t
 - Not super pretty here
 
 ```{r}
-biplot(pca_card)
+#print a biplot from the PCA object
+
+
 ```
 
 ## Closing & Resources
