@@ -169,7 +169,7 @@ Below we do the same cleaning and data preparation that we did for nclim. We not
 ### below we do the same cleaning for nlcimk 
 #apply the ufnction CtoF with tidyverse
 
-state2consider="NJ" 
+state2consider="FL" 
 
 nclimk_last <- nclimk_raw%>%
                filter(state==state2consider)%>%
@@ -287,7 +287,9 @@ model_ts
 
 
 
-### K-Means Clustering in nClimGridData
+## K-Means 
+
+### Clustering in nClimGridData
 
 #### Creating Functions
 
@@ -450,16 +452,16 @@ getmode <- function(v) {
 
 ```{r}
 
-countyPlot<-ClusterWCounty%>%group_by(county)%>% 
-                summarise(Common_Cluster =mean(as.numeric((.cluster))))%>%
-                mutate(fips=fips(state=state2consider,county = county))%>%
-                select(-county)
-
-## if i was to compute the mode
 #countyPlot<-ClusterWCounty%>%group_by(county)%>% 
-#                summarise(Common_Cluster =getmode(.cluster))%>%
+#                summarise(Common_Cluster =mean(as.numeric((.cluster))))%>%
 #                mutate(fips=fips(state=state2consider,county = county))%>%
 #                select(-county)
+
+## if i was to compute the mode
+countyPlot<-ClusterWCounty%>%group_by(county)%>% 
+                summarise(Common_Cluster =getmode(.cluster))%>%
+                mutate(fips=fips(state=state2consider,county = county))%>%
+               select(-county)
 
  countyPlot<- data.frame(countyPlot)
  head(countyPlot)
@@ -472,7 +474,7 @@ countyPlot<-ClusterWCounty%>%group_by(county)%>%
 ```{r}
 plot_usmap( data = countyPlot, values = "Common_Cluster", "counties", include = c(state2consider), color="black")+labs(title=state2consider)+  
   #can comment out the below line if we use the mode method. 
- scale_fill_continuous(low = "#FFCC00", high = "#CC0000", name="Common_Cluster", label=scales::comma)+
+# scale_fill_continuous(low = "#FFCC00", high = "#CC0000", name="Common_Cluster", label=scales::comma)+
     theme(legend.position="right") 
 ```
 
