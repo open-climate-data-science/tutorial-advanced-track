@@ -281,9 +281,8 @@ calculate_cluster <- function(data, k) {
   df <- kmeans(x, center = k) %>%
     augment(data) %>% # creates column ".cluster" with cluster label
     # makes coloumn called silhouette, uses a cluster function called silhouette
-    mutate(silhouette = cluster::silhouette(as.integer(.cluster), dist(x))[, "sil_width"]) 
+    mutate(silhouette = cluster::silhouette(as.integer(.cluster), dist(x))[, "sil_width"])
     # calculate silhouette score
-  
   return(df)
 }
 
@@ -389,6 +388,8 @@ ggsave("Silhouette_Plot_teacher.png")
   nclimk_optimal_cluster <- temp_cluster_data %>%
     filter(k == temp_optimal_k_value)
 
+head(nclimk_optimal_cluster)
+tail(nclimk_optimal_cluster)
 ```
 
 
@@ -397,8 +398,8 @@ ggsave("Silhouette_Plot_teacher.png")
 # color each data point by its associated cluster
 ggplot(data = nclimk_optimal_cluster) +
   geom_point(aes(x = doy, y = tavg_degf, color = .cluster,shape=.cluster), alpha = 0.5) + 
-  labs(x = "Day of Year", y = "Max. Air Temperature (C)", color = "Cluster ID",shape = "Cluster ID")
-
+  labs(x = "Day of Year", y = "Avg Air Temperature (C)", color = "Cluster ID",shape = "Cluster ID")+
+  theme_light()
 ```
 
 
@@ -464,7 +465,7 @@ ggplot(cardinal,aes(x=date,y=AvgT))+geom_line()+labs(title="Total Daily Rainfall
 ### PCA to cluster rain variable 
 
 
-- using cardinal data to obsevre *if* there is clustering 
+- using cardinal data to observe *if* there is clustering 
 
 - used for future models
 
