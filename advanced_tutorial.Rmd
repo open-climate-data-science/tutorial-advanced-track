@@ -360,15 +360,21 @@ str(temp_cluster_data)
 ```{r}
 # plot the data from temp_sil_score_data and visually inspect to determine the k
 # with the largest sil score
-
-ggplot(temp_sil_score_data,aes(k,avg_sil_score))+
+# Add a marker point to visually show the max value!
+temp_sil_score_data%>%
+  ggplot(mapping =aes(x=k,y=avg_sil_score))+
   geom_line()+
   geom_point()+
+  scale_x_continuous(breaks= pretty_breaks())+
+  geom_point(data=temp_sil_score_data%>%
+             filter(max(avg_sil_score)==avg_sil_score),
+             pch=22,
+             size=5,
+             colour="purple")+
   labs(x="Value of k",y="Mean of Silhouette Score",title="Silhouette Score for Value of k")+
-  geom_point(temp_sil_score_data %>% filter(max(avg_sil_score, na.rm = TRUE)),
-             pch=21,
-             size=4,
-             colour="purple")
+  theme_light()
+  
+ggsave("Silhouette_Plot_teacher.png")
 
 
 ```
@@ -390,8 +396,8 @@ ggplot(temp_sil_score_data,aes(k,avg_sil_score))+
 # plot outputs tempavg vs doy
 # color each data point by its associated cluster
 ggplot(data = nclimk_optimal_cluster) +
-  geom_point(aes(x = doy, y = tavg_degf, color = .cluster), alpha = 0.5) + 
-  labs(x = "Day of Year", y = "Max. Air Temperature (C)", color = "Cluster ID")
+  geom_point(aes(x = doy, y = tavg_degf, color = .cluster,shape=.cluster), alpha = 0.5) + 
+  labs(x = "Day of Year", y = "Max. Air Temperature (C)", color = "Cluster ID",shape = "Cluster ID")
 
 ```
 
