@@ -16,7 +16,7 @@ library(tidyverse)
 #time series related 
 library(forecast)
 #install.packages("xts")                      # Install & load xts package
-library("xts")
+library(xts)
 library(TSstudio)
 
 
@@ -33,6 +33,10 @@ library(data.table)
 
 ## plotting in 3d
 library(plotly)
+
+
+## library 
+library(usmap)
 
 ```
 
@@ -419,9 +423,7 @@ ggplot(data = nclimk_optimal_cluster) +
 
 
 
-```{r}
-plot_ly(x=nclimk_optimal_cluster$date, y=nclimk_optimal_cluster$tavg_degf, z=nclimk_optimal_cluster$prcp_cm, type="scatter3d", mode="markers", color=nclimk_optimal_cluster$.cluster)
-```
+
 
 
 
@@ -448,9 +450,9 @@ ggplot(data = nclimk_optimal_cluster) +
 ```{r}
 last_nclimk_raw_jan<-read_csv('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/csv/202101-cty-scaled.csv')
 
-last_nclimk_raw_june<-read_csv('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/csv/202106-cty-scaled.csv')
 
-last_nclimk_raw <- rbind(last_nclimk_raw_jan,last_nclimk_raw_june)
+
+last_nclimk_raw <- last_nclimk_raw_jan
 
 ```
 
@@ -476,6 +478,7 @@ colnames(nclimk_last)[3]<-colnames(nclimk_last)[3]%>%
                           paste0("_cm")
 
 head(nclimk_last)
+tail(nclimk_last)
 
 ```
 
@@ -483,18 +486,80 @@ head(nclimk_last)
 
 
 
-- Below we  get temparary cluster data for each county. 
+- Below we  get temparary cluster data for each county.
+
 ```{r}
+
+numVarstoCluster<- nclimk_last%>%
+                   select(prcp_cm,tavg_degf,tmax_degf)
+
+head(numVarstoCluster)
+
+```
+
+- Now we compute k means for lots of values of k, 2 thru 12. And determine the average silhouette score:
+
+```{r}
+  
+# map cluster calculations function to range of k values
+  county_cluster_data <- tibble(k = 2:12) %>%
+    mutate(kclust = map(k, ~calculate_cluster(numVarstoCluster, .x))) %>%
+    unnest(cols = c(kclust))
+  
+head(county_cluster_data)
+str(county_cluster_data)
+```
+
+```{r}
+  # calculate average silhoutte score (highest for optimal number of k clusters)
+  # for each k value
+  # store these values for each value of k as temp_sil_score_data
+  temp_sil_score_data_county <- county_cluster_data %>%
+    group_by(k) %>%
+    summarize(avg_sil_score = mean(silhouette, na.rm = TRUE))
+ head( temp_sil_score_data_county) 
 ```
 
 
+- Now we plot to determine the highest shil. score: 
+
 
 
 ```{r}
+# plot the data from temp_sil_score_data and visually inspect to determine the k
+# with the largest sil score
+# Add a marker point to visually show the max value!
+temp_sil_score_data_county%>%
+  ggplot(mapping =aes(x=k,y=avg_sil_score))+
+  geom_line()+
+  geom_point()+
+  scale_x_continuous(breaks= pretty_breaks())+
+  geom_point(data=temp_sil_score_data_county%>%
+             filter(max(avg_sil_score)==avg_sil_score),
+             pch=22,
+             size=5,
+             colour="purple")+
+  labs(x="Value of k",y="Mean of Silhouette Score",title="Silhouette Score for Value of k")+
+  theme_light()
+```
+
+
+- This tells us 3 counties is the best! 
+
+
+```{r}
+#computes k means with sil score for k=3 clusers
+temp_cluster_data_final<-county_cluster_data%>%
+                        filter(k==3) # take the k means result from optimal value
+
 temp_cluster_data_final
 
 ClusterWCounty<-cbind(temp_cluster_data_final,nclimk_last$county,nclimk_last$date)
-colnames(ClusterWCounty)[7]="county"
+
+
+colnames(ClusterWCounty)[7:8]=c("county","date")
+
+head(ClusterWCounty)
 
 ```
 
@@ -509,10 +574,13 @@ getmode <- function(v) {
 
 ```{r}
 
-sample<-data.frame(ClusterWCounty%>%group_by(county)%>% 
-                summarise(CommonClust = getmode(.cluster))%>%
+countyPlot<-ClusterWCounty%>%group_by(county)%>% 
+                summarise(Common_Cluster =mean(as.numeric((.cluster))))%>%
                 mutate(fips=fips(state="NC",county = county))%>%
-                select(-county))
+                select(-county)
+
+ countyPlot<- data.frame(countyPlot)
+ head(countyPlot)
               
 ```
 
@@ -525,7 +593,8 @@ library(usmap)
 library(ggplot2)  
 library(rio)  
 
-plot_usmap( data = sample, values = "CommonClust", "counties", include = c("NC"), color="black")+labs(title="North Carolina")+  
+plot_usmap( data = countyPlot, values = "Common_Cluster", "counties", include = c("NC"), color="black")+labs(title="North Carolina")+  
+  scale_fill_continuous(low = "#FFCC00", high = "#CC0000", name="Common_Cluster", label=scales::comma)+
     theme(legend.position="right") 
 ```
 
