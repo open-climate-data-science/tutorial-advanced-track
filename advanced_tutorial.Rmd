@@ -11,8 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(ggplot2)
 #package for cleaning data and logical things 
 library(tidyverse)
-# weather station data from NOAA API 
-library(rnoaa)
+
 
 #time series related 
 library(forecast)
@@ -20,14 +19,13 @@ library(forecast)
 library("xts")
 library(TSstudio)
 
-library(ClusterR)
-library(cluster)
-library(broom)
 
 #other packages for kmeans
 library(here)
 library(tidymodels)
-
+library(ClusterR)
+library(cluster)
+library(broom)
 
 ## allows us to read in large amounts of data
 library(data.table)
@@ -52,7 +50,7 @@ We will be tackling these objectives:
 
 Mr. Wuf works for Mount Mitchell State Park in Burnsville, NC and was recently asked by his boss to write a report summarizing rainfall and temperature data for 2021. This report will be used to help optimize 2022 event planning (e.g., fall color viewing) for park visitors and maintenance scheduling for park staff. He recently got promoted to the head office of the NC State Climate office! Mr. Wuf’s wife, Mrs. Wuf, recently told him about the State Climate Office of North Carolina’s new nClimgrid and Econet data portals. He agrees with her that it would be a great opportunity to check out these new, free tools. After some preliminary sleuthing around nClimgrid, he discovered there was a Monthly U.S Climate Gridded Dataset (nClimGrid; https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00332). How did he miss this? Once he downloads these data from nClimGrid and Econet, Mr. Wuf plans to put the skills he learned in an online R programming course to the test for this real-world, work-related project.\
 
-## API 
+## Importing Data
 
 ### API Introduction 
 
@@ -61,6 +59,8 @@ Mr. Wuf works for Mount Mitchell State Park in Burnsville, NC and was recently a
 - The API data that we will be using is called nClimgrid which consists of four climate variables derived from the GHCN-Dataset: maximum temperature, minimum temperature, average temperature, and precipitation. 
 
 ### nClimgrid Data Set
+
+- **Blurb on DataSet**
 
 ```{r}
 
@@ -81,7 +81,9 @@ load("NCLIM2010.Rda")
 load("NCLIM2020.Rda")
 ```
 
+## Functions/Cleaning
 
+### Combining Data Sets
 
 ```{r}
 ## Lets quickly combind the data sets to get a data set ranging from the above
@@ -96,30 +98,36 @@ nclim <- rbind(nclim_2020s,nclim_2010s)%>%filter(state == c("North Carolina", "S
 ## Call the data set nclimk 
 ## This data set will have 34 thousand objects
 
-nclimk<-rbind(nclim_2020s,nclim_2010s)%>%filter(date >= "2020-01-01" & date <="2020-12-31")%>%filter(state == c("North Carolina", "South Carolina"))
+nclimk_raw<-rbind(nclim_2020s,nclim_2010s)%>%filter(date >= "2020-01-01" & date <="2020-12-31")%>%filter(state == c("North Carolina", "South Carolina"))
 ```
 
+### Functions
 
-
-Using the formula $(C × \frac{9}{5}) + 32=F$, covert the temperature to Fahrenheit. 
+Using the formula $(C \times \frac{9}{5}) + 32=F$, covert the temperature to Fahrenheit. 
 
 
 
 ```{r}
+#create a function for basic syntax 
+# convert data value temperature F to C
+# Call it CtoF
 CtoF<- function(datcols){
   x<- (9/5)*datcols+32
   return(x)
 }
 ```
 
-## Applying functions Basics
+We now will need to apply this function to the temperature columns. 
 
 ```{r}
-#apply the ufnction CtoF with tidyverse
+#apply the fucntion  CtoF with tidyverse functions 
+# to the coloumns relating to tempurature
+colnames(nclim)
 nclim[8:10]<- nclim[8:10]%>% lapply(CtoF)
 head(nclim)
 ```
 
+### Cleaning
 
 ```{r}
 ## Apply Tidyverse piping to easily add degree labels  to the end of certain coloumns for temp
@@ -144,21 +152,21 @@ nclimf <- nclim %>% select(date,prcp_cm,tavg_degf,tmin_degf,tmax_degf,state)%>%
 head(nclimf)
 ```
 
-## Cleaning for nclimk
+### Cleaning for nclimk
 
 Below we do the same cleaning and data preparation that we did for nclim, with the exclusion of the ifNC variable. This is because we will be looking at all of the data
 
 ```{r}
 ### below we do the same cleaning for nlcimk 
 #apply the ufnction CtoF with tidyverse
-nclimk[8:10]<- nclimk[8:10]%>% lapply(CtoF)
+nclimk_raw[8:10]<- nclimk_raw[8:10]%>% lapply(CtoF)
 
 ## Apply Tidyverse piping to easily add degree labels  to the end of certain coloumns for temp
 ## and to add units for precipitation
-colnames(nclimk)[8:10]<-colnames(nclimk)[8:10]%>%tolower()%>% paste0("_degf")
-colnames(nclimk)[7]<-colnames(nclimk)[7]%>%tolower()%>% paste0("_cm")
+colnames(nclimk_raw)[8:10]<-colnames(nclimk_raw)[8:10]%>%tolower()%>% paste0("_degf")
+colnames(nclimk_raw)[7]<-colnames(nclimk_raw)[7]%>%tolower()%>% paste0("_cm")
 
-nclimk <- nclimk %>% select(date,prcp_cm,tavg_degf,tmin_degf,tmax_degf)%>%
+nclimk <- nclimk_raw %>% select(date,prcp_cm,tavg_degf,tmin_degf,tmax_degf)%>%
                     mutate(ifRain= as.factor(as.integer(prcp_cm>0)))
                     
                            
@@ -190,13 +198,13 @@ plotOtemp
 
 ### Simple Regression 
 
-- 
+- *Text Blurb*
 
 ```{r}
 plotOtemp+geom_smooth(method="lm",se=TRUE,col = "black")+theme_classic()
 ```
 
-### Time Series 
+### Time Series Analysis
 
 - A time series is a collection of observations of well-defined data items obtained through repeated measurements over time
 
@@ -225,10 +233,10 @@ test <- temp_ts[index(temp_ts) > train_date]
 
 ```{r}
 # plot the time series object we called temp_ts
-plot(temp_t)
+plot(temp_ts)
 ```
 
-- Time to build the model!
+### Time to build the model!
 
 ```{r}
 # build the time series model
@@ -259,6 +267,11 @@ lines(forecast_xts, col="blue")
 
 #### Creating Functions
 
+
+- We want to create a function that can do a complicated process in as few steps as possible. 
+
+- `calculate_cluster` is the name of the function we are going to create to compute k-means clusters among other information. 
+
 ```{r}
 calculate_cluster <- function(data, k) {
   x <- data %>%
@@ -267,7 +280,9 @@ calculate_cluster <- function(data, k) {
   
   df <- kmeans(x, center = k) %>%
     augment(data) %>% # creates column ".cluster" with cluster label
-    mutate(silhouette = cluster::silhouette(as.integer(.cluster), dist(x))[, "sil_width"]) # calculate silhouette score
+    # makes coloumn called silhouette, uses a cluster function called silhouette
+    mutate(silhouette = cluster::silhouette(as.integer(.cluster), dist(x))[, "sil_width"]) 
+    # calculate silhouette score
   
   return(df)
 }
@@ -276,32 +291,37 @@ calculate_cluster <- function(data, k) {
 
 
 ```{r}
+
+##plot to the data of average tempurature w.r.t date
 plot(nclimk$date,nclimk$tavg_degf)
 
-data2cluster<-data.frame(as.numeric(nclimk$date),nclimk$tavg_degf)
-
-df<-calculate_cluster(data2cluster,4)
-
-
-head(df)
 ```
 
 
 ```{r}
 
-  # data subset
+# data subset nclimk
+# chnage the date to the day of the year!
+# select the column of the date and temperature only
+# omit any missing values 
+# inspect data
 nclimk_tocluster <- nclimk %>%
     mutate(doy = yday(date)) %>%
     select(doy, tavg_degf) %>%
     na.omit()
   
+
+
 head(nclimk_tocluster)
 
 ```
 
+
+- Now we want to set up a data frame to determine which runs 
+
 ```{r}
   
-  # map cluster calculations function to range of k values
+# map cluster calculations function to range of k values
   temp_cluster_data <- tibble(k = 2:12) %>%
     mutate(kclust = map(k, ~calculate_cluster(nclimk_tocluster, .x))) %>%
     unnest(cols = c(kclust))
@@ -311,7 +331,9 @@ str(temp_cluster_data)
 ```
 
 ```{r}
-  # calculate silhoutte score (highest for optimal number of k clusters)
+  # calculate average silhoutte score (highest for optimal number of k clusters)
+  # for each k value
+  # store these values for each value of k as temp_sil_score_data
   temp_sil_score_data <- temp_cluster_data %>%
     group_by(k) %>%
     summarize(avg_sil_score = mean(silhouette, na.rm = TRUE))
