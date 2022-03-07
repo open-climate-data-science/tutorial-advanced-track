@@ -750,7 +750,7 @@ Any Questions?
 
 ### Survey 
 
-Thank you for attending the beginner track tutorial at the Open Climate Data Science Workshop. Please complete the voluntary feedback survey, linked [here](https://docs.google.com/forms/d/e/1FAIpQLSejTJjhvCLbCVKBotUa8VtDzYJBnMCilzPrB4VBzJrs7vXqIQ/viewform). The main purposes of this survey is to (1) determine we met specified teaching goals and (2) improve teaching materials for subsequent tutorial sessions.
+Thank you for attending the beginner track tutorial at the Open Climate Data Science Workshop. Please complete the voluntary feedback survey, linked [here](https://docs.google.com/forms/d/e/1FAIpQLScx3Vri5m2qrSYQGodt-bsFyImg-8P57OKCuuH-UadMVinmXA/viewform). The main purposes of this survey is to (1) determine we met specified teaching goals and (2) improve teaching materials for subsequent tutorial sessions.
 
 
 
