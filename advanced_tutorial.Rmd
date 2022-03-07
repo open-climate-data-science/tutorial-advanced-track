@@ -30,6 +30,10 @@ library(broom)
 ## allows us to read in large amounts of data
 library(data.table)
 
+
+## plotting in 3d
+library(plotly)
+
 ```
 
 # OCDS Advanced Track Tutorial{.tabset}
@@ -307,7 +311,7 @@ plot(nclimk$date,nclimk$tavg_degf)
 # inspect data
 nclimk_tocluster <- nclimk %>%
     mutate(doy = yday(date)) %>%
-    select(doy, tavg_degf) %>%
+    select(doy, tavg_degf,prcp_cm) %>%
     na.omit()
   
 
@@ -400,8 +404,19 @@ tail(nclimk_optimal_cluster)
 ggplot(data = nclimk_optimal_cluster) +
   geom_point(aes(x = doy, y = tavg_degf, color = .cluster,shape=.cluster), alpha = 0.5) + 
   labs(x = "Day of Year", y = "Avg Air Temperature (C)", color = "Cluster ID",shape = "Cluster ID")+
-  theme_light()
+  theme_test()
 ```
+
+
+
+
+
+
+```{r}
+plot_ly(x=nclimk_optimal_cluster$date, y=nclimk_optimal_cluster$tavg_degf, z=nclimk_optimal_cluster$prcp_cm, type="scatter3d", mode="markers", color=nclimk_optimal_cluster$.cluster)
+```
+
+
 
 
 
@@ -414,6 +429,99 @@ ggplot(data = nclimk_optimal_cluster) +
 
 
 ```
+
+## K-Means Cont.
+
+### Clustering Counties
+
+- We will begin clustering counties by reading in county data
+
+- We consider the month of January
+
+```{r}
+last_nclimk_raw_jan<-read_csv('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/csv/202101-cty-scaled.csv')
+
+last_nclimk_raw_june<-read_csv('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/csv/202106-cty-scaled.csv')
+
+last_nclimk_raw <- rbind(last_nclimk_raw_jan,last_nclimk_raw_june)
+
+```
+
+
+
+```{r}
+
+nclimk_last <- last_nclimk_raw%>%
+               filter(state=="NC")%>%
+               select(-c(state,month,region_code,year,day))
+
+#applying function CtoF
+nclimk_last[4:6]<- nclimk_last[4:6]%>%lapply(CtoF)
+
+# nclim_k colnames 
+colnames(nclimk_last)[4:6]<-colnames(nclimk_last)[4:6]%>%
+                            tolower()%>%
+                            paste0("_degf")
+
+#colnames for percp.
+colnames(nclimk_last)[3]<-colnames(nclimk_last)[3]%>%
+                          tolower()%>% 
+                          paste0("_cm")
+
+head(nclimk_last)
+
+```
+
+
+
+
+
+- Below we  get temparary cluster data for each county. 
+```{r}
+```
+
+
+
+
+```{r}
+temp_cluster_data_final
+
+ClusterWCounty<-cbind(temp_cluster_data_final,nclimk_last$county,nclimk_last$date)
+colnames(ClusterWCounty)[7]="county"
+
+```
+
+```{r}
+getmode <- function(v) {
+   uniqv <- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+```
+
+
+
+```{r}
+
+sample<-data.frame(ClusterWCounty%>%group_by(county)%>% 
+                summarise(CommonClust = getmode(.cluster))%>%
+                mutate(fips=fips(state="NC",county = county))%>%
+                select(-county))
+              
+```
+
+
+
+
+
+```{r}
+library(usmap)  
+library(ggplot2)  
+library(rio)  
+
+plot_usmap( data = sample, values = "CommonClust", "counties", include = c("NC"), color="black")+labs(title="North Carolina")+  
+    theme(legend.position="right") 
+```
+
 
 
 
