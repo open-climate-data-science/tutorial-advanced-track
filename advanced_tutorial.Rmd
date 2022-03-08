@@ -251,7 +251,7 @@ plot(temp_ts)
 
 ```{r}
 # build the time series model
-model_ts <- auto.arima(as.numeric(train))
+model_ts <- auto.arima(as.numeric(train), trace=TRUE)
 model_ts
 ```
 
@@ -259,10 +259,15 @@ model_ts
 
 ```{r}
 # plot validation data with forecast on top of plot
-forecast <- forecast(model_ts, h=length(test))
+forecast <- autoplot(forecast(model_ts, h=length(test)))
 forecast_dates <- seq(train_date, length = length(test), by="day")
 
 forecast_xts <- xts(forecast$fitted[1:length(forecast_dates)], order.by=forecast_dates)
+```
+
+```{r}
+library(forecast)
+forecast_1 <- forecast()
 ```
 
 - Finally we plot the validation (testing) data and layer the forecast on top for our time series model
