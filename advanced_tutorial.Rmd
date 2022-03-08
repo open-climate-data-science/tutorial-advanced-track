@@ -101,12 +101,9 @@ nclim <- rbind(nclim_2020s,nclim_2010s)%>%filter(state == c("North Carolina", "S
 
 
 ```{r}
-## Using the whole data set, subset values to only look at the years 2019 to 2020
-## We will be using this data set for k-means clustering later
-## Call the data set nclimk 
-## This data set will have 34 thousand objects
+## We are looking at values from janunary for all the us here, we will eventually subset to a certain state!
 
-nclimk_raw<-nclim_2020s%>%filter(date >= "2020-01-01" & date <="2020-12-31")%>%filter(state == c("North Carolina", "South Carolina"))
+nclimk_raw<-read_csv('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/csv/202101-cty-scaled.csv')
 ```
 
 ### Functions
@@ -165,22 +162,28 @@ head(nclimf)
 Below we do the same cleaning and data preparation that we did for nclim, with the exclusion of the ifNC variable. This is because we will be looking at all of the data
 
 ```{r}
-### below we do the same cleaning for nlcimk 
-#apply the ufnction CtoF with tidyverse
-nclimk_raw[8:10]<- nclimk_raw[8:10]%>% lapply(CtoF)
+# we consider a certain state
+state2consider="NY" 
 
-## Apply Tidyverse piping to easily add degree labels  to the end of certain coloumns for temp
-## and to add units for precipitation
-colnames(nclimk_raw)[8:10]<-colnames(nclimk_raw)[8:10]%>%tolower()%>% paste0("_degf")
-colnames(nclimk_raw)[7]<-colnames(nclimk_raw)[7]%>%tolower()%>% paste0("_cm")
+nclimk_last <- nclimk_raw%>%
+               filter(state==state2consider)%>%
+               select(-c(state,month,region_code,year,day))
 
-nclimk <- nclimk_raw %>% select(date,prcp_cm,tavg_degf,tmin_degf,tmax_degf)%>%
-                    mutate(ifRain= as.factor(as.integer(prcp_cm>0)))
-                    
-                           
-                           
-#viewing the data for k-means
-head(nclimk)
+#applying function CtoF
+nclimk_last[4:6]<- nclimk_last[4:6]%>%lapply(CtoF)
+
+# nclim_k colnames 
+colnames(nclimk_last)[4:6]<-colnames(nclimk_last)[4:6]%>%
+                            tolower()%>%
+                            paste0("_degf")
+
+#colnames for percp.
+colnames(nclimk_last)[3]<-colnames(nclimk_last)[3]%>%
+                          tolower()%>% 
+                          paste0("_cm")
+
+head(nclimk_last)
+tail(nclimk_last)
 
 ```
 
@@ -297,23 +300,20 @@ calculate_cluster <- function(data, k) {
 
 
 ```{r}
-
+nclimk<-data.frame(nclimk_last)
 ##plot to the data of average tempurature w.r.t date
-plot(nclimk$date,nclimk$tavg_degf)
+plot_ly(x=nclimk$prcp_cm,y=nclimk$tavg_degf,z=nclimk$tmax_degf)
 
 ```
 
 
 ```{r}
-
 # data subset nclimk
-# chnage the date to the day of the year!
-# select the column of the date and temperature only
+# we want to only look at the numeric variables
 # omit any missing values 
 # inspect data
 nclimk_tocluster <- nclimk %>%
-    mutate(doy = yday(date)) %>%
-    select(doy, tavg_degf,prcp_cm) %>%
+    select(tavg_degf,prcp_cm,tmax_degf) %>%
     na.omit()
   
 
@@ -400,161 +400,20 @@ tail(nclimk_optimal_cluster)
 ```
 
 
-```{r}
-# plot outputs tempavg vs doy
-# color each data point by its associated cluster
-ggplot(data = nclimk_optimal_cluster) +
-  geom_point(aes(x = doy, y = tavg_degf, color = .cluster,shape=.cluster), alpha = 0.5) + 
-  labs(x = "Day of Year", y = "Avg Air Temperature (C)", color = "Cluster ID",shape = "Cluster ID")+
-  theme_test()
-```
-
-
-
-
-
-
-
-
-
-
-
 
 ```{r}
-# plot outputs density of doy colored by cluster
-ggplot(data = nclimk_optimal_cluster) +
-  geom_density(aes(x = doy, fill = .cluster), alpha = 0.5) + 
-  labs(x = "Day of Year", y = "Density", fill = "Cluster ID") +
-  theme_classic()
+# Call this ClusterWCounty
 
-
-```
-
-## K-Means Cont.
-
-### Clustering Counties
-
-- We will begin clustering counties by reading in county data
-
-- We consider the month of January
-
-```{r}
-last_nclimk_raw_jan<-read_csv('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/csv/202101-cty-scaled.csv')
-
-
-
-last_nclimk_raw <- last_nclimk_raw_jan
-
-```
-
-
-
-```{r}
-
-nclimk_last <- last_nclimk_raw%>%
-               filter(state=="NC")%>%
-               select(-c(state,month,region_code,year,day))
-
-#applying function CtoF
-nclimk_last[4:6]<- nclimk_last[4:6]%>%lapply(CtoF)
-
-# nclim_k colnames 
-colnames(nclimk_last)[4:6]<-colnames(nclimk_last)[4:6]%>%
-                            tolower()%>%
-                            paste0("_degf")
-
-#colnames for percp.
-colnames(nclimk_last)[3]<-colnames(nclimk_last)[3]%>%
-                          tolower()%>% 
-                          paste0("_cm")
-
-head(nclimk_last)
-tail(nclimk_last)
-
-```
-
-
-
-
-
-- Below we  get temparary cluster data for each county.
-
-```{r}
-
-numVarstoCluster<- nclimk_last%>%
-                   select(prcp_cm,tavg_degf,tmax_degf)
-
-head(numVarstoCluster)
-
-```
-
-- Now we compute k means for lots of values of k, 2 thru 12. And determine the average silhouette score:
-
-```{r}
-  
-# map cluster calculations function to range of k values
-  county_cluster_data <- tibble(k = 2:12) %>%
-    mutate(kclust = map(k, ~calculate_cluster(numVarstoCluster, .x))) %>%
-    unnest(cols = c(kclust))
-  
-head(county_cluster_data)
-str(county_cluster_data)
-```
-
-```{r}
-  # calculate average silhoutte score (highest for optimal number of k clusters)
-  # for each k value
-  # store these values for each value of k as temp_sil_score_data
-  temp_sil_score_data_county <- county_cluster_data %>%
-    group_by(k) %>%
-    summarize(avg_sil_score = mean(silhouette, na.rm = TRUE))
- head( temp_sil_score_data_county) 
-```
-
-
-- Now we plot to determine the highest shil. score: 
-
-
-
-```{r}
-# plot the data from temp_sil_score_data and visually inspect to determine the k
-# with the largest sil score
-# Add a marker point to visually show the max value!
-temp_sil_score_data_county%>%
-  ggplot(mapping =aes(x=k,y=avg_sil_score))+
-  geom_line()+
-  geom_point()+
-  scale_x_continuous(breaks= pretty_breaks())+
-  geom_point(data=temp_sil_score_data_county%>%
-             filter(max(avg_sil_score)==avg_sil_score),
-             pch=22,
-             size=5,
-             colour="purple")+
-  labs(x="Value of k",y="Mean of Silhouette Score",title="Silhouette Score for Value of k")+
-  theme_light()
-```
-
-
-- This tells us 3 counties is the best! 
-
-
-```{r}
-#computes k means with sil score for k=3 clusers
-temp_cluster_data_final<-county_cluster_data%>%
-                        filter(k==3) # take the k means result from optimal value
-
-temp_cluster_data_final
-
-ClusterWCounty<-cbind(temp_cluster_data_final,nclimk_last$county,nclimk_last$date)
-
-
+ClusterWCounty<-cbind(nclimk_optimal_cluster,nclimk$county,nclimk$date)
 colnames(ClusterWCounty)[7:8]=c("county","date")
-
 head(ClusterWCounty)
-
 ```
 
+
+- We have a function to compute the mode of a data set. I.e. This will help us compute the determine the cluster every county most often belongs too. 
+
 ```{r}
+#function for the mode
 getmode <- function(v) {
    uniqv <- unique(v)
    uniqv[which.max(tabulate(match(v, uniqv)))]
@@ -562,35 +421,39 @@ getmode <- function(v) {
 ```
 
 
-
 ```{r}
 
 countyPlot<-ClusterWCounty%>%group_by(county)%>% 
                 summarise(Common_Cluster =mean(as.numeric((.cluster))))%>%
-                mutate(fips=fips(state="NC",county = county))%>%
+                mutate(fips=fips(state=state2consider,county = county))%>%
                 select(-county)
+
+## if i was to compute the mode
+#countyPlot<-ClusterWCounty%>%group_by(county)%>% 
+#                summarise(Common_Cluster =getmode(.cluster))%>%
+ #               mutate(fips=fips(state=state2consider,county = county))%>%
+#               select(-county)
 
  countyPlot<- data.frame(countyPlot)
  head(countyPlot)
               
 ```
 
-
-
-
-
 ```{r}
-library(usmap)  
-library(ggplot2)  
-library(rio)  
-
-plot_usmap( data = countyPlot, values = "Common_Cluster", "counties", include = c("NC"), color="black")+labs(title="North Carolina")+  
-  scale_fill_continuous(low = "#FFCC00", high = "#CC0000", name="Common_Cluster", label=scales::comma)+
+plot_usmap( data = countyPlot, 
+            values = "Common_Cluster", "counties", 
+            include = c(state2consider), 
+            color="black")+
+            labs(title=paste0(state2consider," Cluster Mapping"))+  
+   #can comment out the below line if we use the mode method. 
+    scale_fill_continuous(low = "#FFCC00", high = "#CC0000", name="Common_Cluster", label=scales::comma)+
     theme(legend.position="right") 
 ```
 
-
-
+```{r}
+#3d plot for all of our clusters
+plot_ly(x=nclimk$prcp_cm,y=nclimk$tavg_degf,z=nclimk$tmax_degf,color=ClusterWCounty$.cluster)
+```
 
 ## Bonus (for time) Content!
 
