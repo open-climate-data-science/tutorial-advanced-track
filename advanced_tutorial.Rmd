@@ -269,7 +269,6 @@ forecast_xts <- xts(forecast$mean, order.by=forecast_dates)
 
 ```{r}
 plot(test, main = 'Forecast Comparison')
-lines(forecast_xts, col="blue")
 ```
 
 
