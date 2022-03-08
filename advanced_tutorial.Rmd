@@ -293,7 +293,9 @@ forecast <- autoplot(forecast(model_ts, h=length(test)))
 forecast
 ```
 
-### K-Means Clustering in nClimGridData
+## K-Means
+
+#### Clustering in nClimGridData
 
 #### Creating Functions
 
@@ -467,7 +469,7 @@ getmode <- function(v) {
 
 ## if i was to compute the mode
 countyPlot<-ClusterWCounty%>%group_by(county)%>% 
-                summarise(Common_Cluster =median(as.numeric(.cluster)))%>%
+                summarise(Common_Cluster =getmode(.cluster))%>%
                mutate(fips=fips(state=state2consider,county = county))%>%
                select(-county)
 
@@ -488,10 +490,24 @@ plot_usmap( data = countyPlot,
     theme(legend.position="right") 
 ```
 
+
+
+- Let us examine this topographical map from [geology.com]()
+
+![NC Map](images/NCelv.PNG)
+
+
 ```{r}
 #3d plot for all of our clusters, same as before but now apply cluster coloring from ClusterWCounty
 plot_ly(x=nclimk$prcp_cm,y=nclimk$tavg_degf,z=nclimk$tmax_degf,color=ClusterWCounty$.cluster)
 ```
+
+- Now let us look at the data cluster assignment density for Suzie's analysis:  Pender County.  
+
+
+
+
+
 
 ## Bonus (for time) Content!
 
