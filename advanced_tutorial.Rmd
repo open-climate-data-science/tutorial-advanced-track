@@ -38,6 +38,12 @@ library(plotly)
 ## library 
 library(usmap)
 
+## for date manipulation 
+library(lubridate)
+
+## for PCA
+library(corrplot)
+
 ```
 
 # OCDS Advanced Track Tutorial{.tabset}
@@ -120,10 +126,21 @@ nclim <- rbind(nclim_2020s,nclim_2010s)%>%filter(state == c("North Carolina", "S
 
 
 ```{r}
-## We are looking at values from January for all the US here, we will eventually subset to a certain state!
+## We are looking at values from January,March,April,July for all the US here, we will eventually subset to a certain state!
 ## Read in the data with county labels, call it nclimk_raw
 
-nclimk_raw<-read_csv('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/csv/202101-cty-scaled.csv')
+nclimk_raw =data.frame()
+
+for (Month_val in seq(1,8,2)){
+  
+ Link= paste0('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/csv/20210',Month_val,'-cty-scaled.csv')
+  
+  nclimk_raw_temp<-read_csv(Link)  
+
+  nclimk_raw = rbind(nclimk_raw,nclimk_raw_temp)
+  
+}
+
 ```
 
 ### Functions
@@ -368,6 +385,8 @@ head(nclimk_tocluster)
   
 head(temp_cluster_data)
 str(temp_cluster_data)
+
+save()
 ```
 
 ```{r}
@@ -505,7 +524,25 @@ plot_ly(x=nclimk$prcp_cm,y=nclimk$tavg_degf,z=nclimk$tmax_degf,color=ClusterWCou
 - Now let us look at the data cluster assignment density for Suzie's analysis:  Pender County.  
 
 
+```{r}
+## Filter Data by Pender County
+PenderCtDOY<-ClusterWCounty%>%filter(county=="Pender County")%>%
+             mutate(Cluster_Val = as.numeric(.cluster))%>%
+            select(-c(k,county,.cluster,silhouette))
 
+
+head(PenderCtDOY)
+
+```
+
+
+```{r}
+# plot outputs density of doy colored by cluster
+ggplot(data = PenderCtDOY) +
+  geom_density(aes(x = date, fill = Cluster_Val), alpha = 0.5) + 
+  labs(x = "Date", y = "Density", fill = "Cluster ID") +
+  theme_classic()
+```
 
 
 
