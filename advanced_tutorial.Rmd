@@ -85,12 +85,16 @@ Mr. Wuf works for Mount Mitchell State Park in Burnsville, NC and was recently a
 ```{r}
 
 ## Read in data from AWS nClimGrid 2020-2021
+## From the decadal section with state labels
+## Drop missing values
 nclim_2020s<-read_csv('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/decadal/2020-2021-ste-decadal.csv')%>%drop_na()
 ```
 
 ```{r}
 
 ## Read in nClimGrid 2010-2019
+## From decadal with state labels
+## Use the fread command from data.table
 nclim_2010s<-fread('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/decadal/2010-2019-ste-decadal.csv')%>%drop_na()
 
 ```
@@ -105,15 +109,19 @@ load("NCLIM2020.Rda")
 
 ### Combining Data Sets
 
+- We are going to make two datasets `nclim` as well as `nclimk_raw`
+- `nclim` will be used for time series analyses and `nclimk_raw` will be used for k means clustering
+
 ```{r}
-## Lets quickly combind the data sets to get a data set ranging from the above
+## Lets quickly combine the data sets to get a data set ranging from the above
 ## lets also filter for data record that pertain to North Carolina
 nclim <- rbind(nclim_2020s,nclim_2010s)%>%filter(state == c("North Carolina", "South Carolina"))
 ```
 
 
 ```{r}
-## We are looking at values from janunary for all the us here, we will eventually subset to a certain state!
+## We are looking at values from January for all the US here, we will eventually subset to a certain state!
+## Read in the data with county labels, call it nclimk_raw
 
 nclimk_raw<-read_csv('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/csv/202101-cty-scaled.csv')
 ```
@@ -121,7 +129,6 @@ nclimk_raw<-read_csv('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/
 ### Functions
 
 Using the formula $(C \times \frac{9}{5}) + 32=F$, covert the temperature to Fahrenheit. 
-
 
 
 ```{r}
@@ -137,8 +144,8 @@ CtoF<- function(datcols){
 We now will need to apply this function to the temperature columns. 
 
 ```{r}
-#apply the fucntion  CtoF with tidyverse functions 
-# to the coloumns relating to tempurature
+#apply the function  CtoF with tidyverse functions 
+# to the columns relating to temperature
 colnames(nclim)
 nclim[8:10]<- nclim[8:10]%>% lapply(CtoF)
 head(nclim)
@@ -147,8 +154,9 @@ head(nclim)
 ### Cleaning
 
 ```{r}
-## Apply Tidyverse piping to easily add degree labels  to the end of certain coloumns for temp
+## Apply Tidyverse piping to easily add degree labels to the end of certain columns for temp
 ## and to add units for precipitation
+## Inspect 
 colnames(nclim)[8:10]<-colnames(nclim)[8:10]%>%tolower()%>% paste0("_degf")
 colnames(nclim)[7]<-colnames(nclim)[7]%>%tolower()%>% paste0("_cm")
 
@@ -156,12 +164,11 @@ head(nclim)
 ```
 
 ```{r}
-## Keep the weather data coloumns as well as the date, drop all other coloumns 
-## Further Create the variable ifRain: a factor to indicate wether it rained on a certain day
+## Keep the weather data columns as well as the date, drop all other columns 
+## Further Create the variable ifRain: a factor to indicate whether it rained on a certain day
 ## Call this final data set nclimf
 
 nclimf <- nclim %>% select(date,prcp_cm,tavg_degf,tmin_degf,tmax_degf,state)%>%
-                    mutate(ifNC=as.factor(as.integer(state=="North Carolina")))%>%
                     mutate(ifRain= as.factor(as.integer(prcp_cm>0)))%>%
                     select(-state)
                            
@@ -209,7 +216,7 @@ tail(nclimk_last)
 ```{r}
 # scatterplot of avg tempurature vs time, color the points red
 ## add labels
-## save the plot at plotOTemp
+## save the plot at plotOTemp object
 plotOtemp<-ggplot(nclim,aes(x=date,y=tavg_degf))+geom_point(colour="red")+labs(x = "Date", y = "Average Tempurature (F)",title ="Tempurature Over Time")
 plotOtemp
 ```
@@ -224,6 +231,7 @@ plotOtemp
 - We will perform a simple regression see if that model fits the data well
 
 ```{r}
+## Using the plotOtemp object create a linear regression for the same data
 plotOtemp+geom_smooth(method="lm",se=TRUE,col = "black")+theme_classic()
 ```
 
@@ -247,6 +255,7 @@ temp_ts<-xts(nclimf$tavg_degf,nclim$date)
 
 ```{r}
 # train/validation split
+# 70% of data goes to the training data, split by date
 train_date <- nclimf$date[round(nrow(temp_ts) *0.7)]
 train <- temp_ts[index(temp_ts) <= train_date]
 test <- temp_ts[index(temp_ts) > train_date]
@@ -276,17 +285,13 @@ plot(test)
 
 - Once the model has been created, we will use that to create a forecasting xts object
 
-```{r}
-# plot validation data with forecast on top of plot
-forecast <- autoplot(forecast(model_ts, h=length(test)))
-forecast
-forecast_dates <- seq(train_date, length = length(test), by="day")
-
-forecast_xts <- xts(forecast$mean, order.by=forecast_dates)
-```
 - Finally we plot the validation (testing) data and layer the forecast on top for our time series model
 
-
+```{r}
+# plot validation data with forecast using autoplot
+forecast <- autoplot(forecast(model_ts, h=length(test)))
+forecast
+```
 
 ### K-Means Clustering in nClimGridData
 
@@ -298,6 +303,9 @@ forecast_xts <- xts(forecast$mean, order.by=forecast_dates)
 - `calculate_cluster` is the name of the function we are going to create to compute k-means clusters among other information. 
 
 ```{r}
+## Create a function to take in data and a number of k clusters
+## We want to scale input data, perform k means, and output a dataframe with assigned clusters and silhouette score
+
 calculate_cluster <- function(data, k) {
   x <- data %>%
     na.omit() %>%
@@ -315,6 +323,9 @@ calculate_cluster <- function(data, k) {
 
 
 ```{r}
+# Convert nclimlast to data frame, call it nclimk
+# Use plot_ly to create a 3D scatterplot
+
 nclimk<-data.frame(nclimk_last)
 ##plot to the data of average tempurature w.r.t date
 plot_ly(x=nclimk$prcp_cm,y=nclimk$tavg_degf,z=nclimk$tmax_degf)
@@ -340,9 +351,15 @@ head(nclimk_tocluster)
 
 - Now we want to set up a data frame to determine which runs 
 
+- Below we will use the `map` function, more help can be found from this
+[link](https://www.rdocumentation.org/packages/purrr/versions/0.2.5/topics/map)
+
+- This works similar to `lapply` but runs C++ in the background
+
 ```{r}
-  
 # map cluster calculations function to range of k values
+# make cluster and silhoutte scores for each k
+# Inspect data
   temp_cluster_data <- tibble(k = 2:12) %>%
     mutate(kclust = map(k, ~calculate_cluster(nclimk_tocluster, .x))) %>%
     unnest(cols = c(kclust))
@@ -394,7 +411,9 @@ temp_sil_score_data%>%
              colour="purple")+
   labs(x="Value of k",y="Mean of Silhouette Score",title="Silhouette Score for Value of k")+
   theme_light()
-  
+
+
+# save plot as image 
 ggsave("Silhouette_Plot_teacher.png")
 
 
@@ -417,6 +436,8 @@ tail(nclimk_optimal_cluster)
 
 
 ```{r}
+# Combine nclim_optimal_cluster with appropriate county data as well as date
+# Update column names
 # Call this ClusterWCounty
 
 ClusterWCounty<-cbind(nclimk_optimal_cluster,nclimk$county,nclimk$date)
@@ -437,7 +458,8 @@ getmode <- function(v) {
 
 
 ```{r}
-
+# Create a common cluster vector for the new data frame called countyplot
+# Change the name of the county to the appropriate fips code
 countyPlot<-ClusterWCounty%>%group_by(county)%>% 
                 summarise(Common_Cluster =mean(as.numeric((.cluster))))%>%
                 mutate(fips=fips(state=state2consider,county = county))%>%
@@ -455,6 +477,7 @@ countyPlot<-ClusterWCounty%>%group_by(county)%>%
 ```
 
 ```{r}
+# Using plot_usmap to plot North Carolina counties with their appropriate clusters
 plot_usmap( data = countyPlot, 
             values = "Common_Cluster", "counties", 
             include = c(state2consider), 
@@ -466,7 +489,7 @@ plot_usmap( data = countyPlot,
 ```
 
 ```{r}
-#3d plot for all of our clusters
+#3d plot for all of our clusters, same as before but now apply cluster coloring from ClusterWCounty
 plot_ly(x=nclimk$prcp_cm,y=nclimk$tavg_degf,z=nclimk$tmax_degf,color=ClusterWCounty$.cluster)
 ```
 
