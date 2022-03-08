@@ -69,6 +69,10 @@ Mr. Wuf works for Mount Mitchell State Park in Burnsville, NC and was recently a
 
 - Cloud based data is stored in logical pools across storage servers located on premises or in a data center managed by a third party cloud provider such as amazon web services (aws)
 
+
+![](images/cloud_data.jpg)
+
+
 ### nClimgrid Data Set
 
 - The NOAA Monthly U.S. Climate Gridded Dataset (NClimGrid) consists of four climate variables derived from the GHCN-D dataset: maximum temperature, minimum temperature, average temperature and precipitation. 
