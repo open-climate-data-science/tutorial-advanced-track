@@ -257,31 +257,17 @@ model_ts
 ```{r}
 # plot validation data with forecast on top of plot
 forecast <- autoplot(forecast(model_ts, h=length(test)))
+forecast
 forecast_dates <- seq(train_date, length = length(test), by="day")
 
-forecast_xts <- xts(forecast$fitted[1:length(forecast_dates)], order.by=forecast_dates)
+forecast_xts <- xts(forecast$mean, order.by=forecast_dates)
 ```
-
-```{r}
-library(forecast)
-forecast_1 <- forecast()
-```
-
 - Finally we plot the validation (testing) data and layer the forecast on top for our time series model
 
 ```{r}
 plot(test, main = 'Forecast Comparison')
 lines(forecast_xts, col="blue")
 ```
-
-```{r}
-tbats_test = tbats(as.vector(temp_ts))
-tbats_forecast = forecast(tbats_test, h=length(test))
-plot(tbats_forecast)
-```
-
-
-
 
 
 ### K-Means Clustering in nClimGridData
