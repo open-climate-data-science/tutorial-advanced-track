@@ -259,7 +259,7 @@ model_ts
 forecast <- forecast(model_ts, h=length(test))
 forecast_dates <- seq(train_date, length = length(test), by="day")
 
-forecast_xts <- xts(forecast$fitted, order.by=forecast_dates)
+forecast_xts <- xts(forecast$fitted[1:length(forecast_dates)], order.by=forecast_dates)
 ```
 
 - Finally we plot the validation (testing) data and layer the forecast on top for our time series model
