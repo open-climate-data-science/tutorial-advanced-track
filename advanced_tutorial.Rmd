@@ -212,7 +212,7 @@ plotOtemp
 
 ### Simple Regression 
 
-- *Text Blurb*
+- We will perform a simple regression see if that model fits the data well
 
 ```{r}
 plotOtemp+geom_smooth(method="lm",se=TRUE,col = "black")+theme_classic()
@@ -258,6 +258,13 @@ model_ts <- auto.arima(as.numeric(train), trace=TRUE)
 model_ts
 ```
 
+- Now we will plot the test data
+
+```{r}
+#plot the test data
+plot(test)
+```
+
 - Once the model has been created, we will use that to create a forecasting xts object
 
 ```{r}
@@ -270,9 +277,6 @@ forecast_xts <- xts(forecast$mean, order.by=forecast_dates)
 ```
 - Finally we plot the validation (testing) data and layer the forecast on top for our time series model
 
-```{r}
-plot(test, main = 'Forecast Comparison')
-```
 
 
 ### K-Means Clustering in nClimGridData
