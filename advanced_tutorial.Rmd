@@ -467,7 +467,7 @@ getmode <- function(v) {
 
 ## if i was to compute the mode
 countyPlot<-ClusterWCounty%>%group_by(county)%>% 
-                summarise(Common_Cluster =getmode(.cluster))%>%
+                summarise(Common_Cluster =median(as.numeric(.cluster)))%>%
                mutate(fips=fips(state=state2consider,county = county))%>%
                select(-county)
 
