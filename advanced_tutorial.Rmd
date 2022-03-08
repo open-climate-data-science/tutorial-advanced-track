@@ -80,6 +80,8 @@ Mr. Wuf works for Mount Mitchell State Park in Burnsville, NC and was recently a
 
 - On an annual basis, approximately one year of "final" nClimGrid will be submitted to replace the initially supplied "preliminary" data for the same time period. 
 
+- We can find nClimGrid Data hosted on AWS servers [here](https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/index.html#EpiNOAA/).
+
 ```{r}
 
 ## Read in data from AWS nClimGrid 2020-2021
