@@ -182,7 +182,7 @@ Below we do the same cleaning and data preparation that we did for nclim, with t
 
 ```{r}
 # we consider a certain state
-state2consider="NY" 
+state2consider="NC" 
 
 nclimk_last <- nclimk_raw%>%
                filter(state==state2consider)%>%
@@ -460,16 +460,16 @@ getmode <- function(v) {
 ```{r}
 # Create a common cluster vector for the new data frame called countyplot
 # Change the name of the county to the appropriate fips code
-countyPlot<-ClusterWCounty%>%group_by(county)%>% 
-                summarise(Common_Cluster =mean(as.numeric((.cluster))))%>%
-                mutate(fips=fips(state=state2consider,county = county))%>%
-                select(-county)
+#countyPlot<-ClusterWCounty%>%group_by(county)%>% 
+#                summarise(Common_Cluster =mean(as.numeric((.cluster))))%>%
+#                mutate(fips=fips(state=state2consider,county = county))%>%
+#                select(-county)
 
 ## if i was to compute the mode
-#countyPlot<-ClusterWCounty%>%group_by(county)%>% 
-#                summarise(Common_Cluster =getmode(.cluster))%>%
- #               mutate(fips=fips(state=state2consider,county = county))%>%
-#               select(-county)
+countyPlot<-ClusterWCounty%>%group_by(county)%>% 
+                summarise(Common_Cluster =getmode(.cluster))%>%
+               mutate(fips=fips(state=state2consider,county = county))%>%
+               select(-county)
 
  countyPlot<- data.frame(countyPlot)
  head(countyPlot)
@@ -484,7 +484,7 @@ plot_usmap( data = countyPlot,
             color="black")+
             labs(title=paste0(state2consider," Cluster Mapping"))+  
    #can comment out the below line if we use the mode method. 
-    scale_fill_continuous(low = "#FFCC00", high = "#CC0000", name="Common_Cluster", label=scales::comma)+
+    #scale_fill_continuous(low = "#FFCC00", high = "#CC0000", name="Common_Cluster", label=scales::comma)+
     theme(legend.position="right") 
 ```
 
