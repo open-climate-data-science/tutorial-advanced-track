@@ -134,7 +134,7 @@ Using the formula $(C \times \frac{9}{5}) + 32=F$, covert the temperature to Fah
 ```{r}
 #create a function for basic syntax 
 # convert data value temperature F to C
-# Call it CtoF
+# Call the function CtoF
 CtoF<- function(datcols){
   x<- (9/5)*datcols+32
   return(x)
