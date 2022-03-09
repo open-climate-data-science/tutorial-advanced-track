@@ -131,7 +131,7 @@ nclim <- rbind(nclim_2020s,nclim_2010s)%>%filter(state == c("North Carolina", "S
 
 nclimk_raw =data.frame()
 
-for (Month_val in seq(1,8,2)){
+for (Month_val in 1:2){
   
  Link= paste0('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/csv/20210',Month_val,'-cty-scaled.csv')
   
@@ -141,6 +141,8 @@ for (Month_val in seq(1,8,2)){
   
 }
 
+
+ #nclimk_raw<-read_csv('https://noaa-nclimgrid-daily-pds.s3.amazonaws.com/EpiNOAA/csv/202101-cty-scaled.csv')
 ```
 
 ### Functions
@@ -217,6 +219,8 @@ colnames(nclimk_last)[4:6]<-colnames(nclimk_last)[4:6]%>%
 colnames(nclimk_last)[3]<-colnames(nclimk_last)[3]%>%
                           tolower()%>% 
                           paste0("_cm")
+
+nclimk_last$date<-nclimk_last$date%>%as.Date("%m/%e/%Y")
 
 head(nclimk_last)
 tail(nclimk_last)
@@ -379,6 +383,8 @@ head(nclimk_tocluster)
 # map cluster calculations function to range of k values
 # make cluster and silhoutte scores for each k
 # Inspect data
+
+set.seed(314)
   temp_cluster_data <- tibble(k = 2:12) %>%
     mutate(kclust = map(k, ~calculate_cluster(nclimk_tocluster, .x))) %>%
     unnest(cols = c(kclust))
@@ -386,7 +392,7 @@ head(nclimk_tocluster)
 head(temp_cluster_data)
 str(temp_cluster_data)
 
-save()
+
 ```
 
 ```{r}
@@ -527,8 +533,7 @@ plot_ly(x=nclimk$prcp_cm,y=nclimk$tavg_degf,z=nclimk$tmax_degf,color=ClusterWCou
 ```{r}
 ## Filter Data by Pender County
 PenderCtDOY<-ClusterWCounty%>%filter(county=="Pender County")%>%
-             mutate(Cluster_Val = as.numeric(.cluster))%>%
-            select(-c(k,county,.cluster,silhouette))
+            select(-c(k,county,silhouette))
 
 
 head(PenderCtDOY)
@@ -539,11 +544,37 @@ head(PenderCtDOY)
 ```{r}
 # plot outputs density of doy colored by cluster
 ggplot(data = PenderCtDOY) +
-  geom_density(aes(x = date, fill = Cluster_Val), alpha = 0.5) + 
+  geom_density(aes(x = date, fill = .cluster), alpha = 0.5) + 
   labs(x = "Date", y = "Density", fill = "Cluster ID") +
   theme_classic()
 ```
 
+- We see a major influence in Pender County 
+
+```{r}
+## Observe Pender County Weather Data in Clusters 
+
+PenderCtDOY%>%
+  select(-c(date))%>%
+  group_by(.cluster)%>%
+  summarise(across(everything(), list(mean)))
+
+## Further we can compare the averages acorss 
+#MCdoweel and Pender
+
+ClusterWCounty%>%
+  filter(county==c("McDowell County","Pender County"))%>%
+  select(-c(k,silhouette,date,.cluster))%>%
+  group_by(county)%>%
+  summarise(across(everything(), list(mean)))
+
+```
+
+
+- We can observe stark differences in the tempurature and rain across these counties 
+  - Evident why they are in differing clusters
+  
+- Knowing these differences will better inform Suize's berry growing friends!
 
 
 ## Bonus (for time) Content!
