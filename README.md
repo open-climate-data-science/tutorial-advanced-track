@@ -25,3 +25,8 @@ After this 2 hours tutorial you will:
     - TMIN: recorded minimum tempurature atained (in deg C) throughout the course of the day  
     - TMAX: recorded maximum tempurature atained (in deg C) throughout the course of the day 
 - NCLIM2020.Rda: Similar .Rda file containing a dataframe for the same variables from the same stations for the start of the 20's decade. Used for time series analysis over several days.  
+- advanced_tutorial.Rmd: R Markdown file used as basis for advanced tutorial. Openable in R Studio and analogous to binder teacher version (mentioned below). 
+- advanced_tutorial.html: HTML output file of the .Rmd file with all solutions and code blocks. Similar to teacher version. Not editable but interactive with page buttons. 
+- advanced_tutorial_student.ipynb: Binder Notebook file with empty code blocks used for tutorial purposed and live coding. Outputs not included. Runs in R kernel.
+- advanced_tutorial_teacher.ipynb: Binder Notebook file with filled out with solutions and ouput plots and models to advanced tutorial. Runs in R kernel.
+- cardinal_data.csv: CSV of ECONet Station Data used for PCA Bonus Section
