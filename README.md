@@ -41,7 +41,7 @@ After this 2 hours tutorial you will:
 
 If you wish to see the tutorials as presented in the Open Climate Data Science Workshop please visting the tutorial page of the [website](https://open-climate-data-science.github.io/tutorials/). Here you will find two links for the Advanced Track:
 
-    -  Student: A notebook with incomplete code blocks that was accessed by partipants
-    -  Teacher: A helpful reference guide with completed code from the tutorial
+-  Student: A notebook with incomplete code blocks that was accessed by partipants
+-  Teacher: A helpful reference guide with completed code from the tutorial
    
 Please note a recording of the tutorial is also attached on the referenced website page. 
