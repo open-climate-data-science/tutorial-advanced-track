@@ -1,16 +1,13 @@
 
-# To cite the ShellCast web application, please use:
+# To cite the NCSCO Workshop Advanced Track Tutorial , please use:
 
-> Saia, S. M., Parham, S. P., and Nelson, N. G. 2020. *ShellCast Web Application*. North Carolina State University, Department of Biological and Agricultural Engineering, Raleigh, NC. Available online: [go.ncsu.edu/shellcast](https://go.ncsu.edu/shellcast)
+> Gawron, N. C., and Popa, L. O., 2022. *NCSCO Workshop Advanced Track Tutorial*. North Carolina State University, College of Sciences, Raleigh, NC. Available online: [github.com/tutorial-advanced-track](https://github.com/open-climate-data-science/tutorial-advanced-track)
 
-# To cite the ShellCast forecast algorithm please use:
 
-> This work is still in progress and is not yet peer-reviewed. Please cite the ShellCast web application as described above.
+#  NCSCO Workshop Advanced Track Tutorial License
 
-# ShellCast License
-
-See [docs/LICENSE.md](/docs/LICENSE.md) for details on the license used for ShellCast.
+See [LICENSE.md](LICENSE.md) for details on the license used for the tutorial.
 
 # Contact
 
-If you have any questions, feedback, or suggestions please submit issues [through the NCSU Enterprise GitHub](https://github.ncsu.edu/biosystemsanalyticslab/shellcast/issues) or [through GitHub (public)](https://github.com/Biosystems-Analytics-Lab/shellcast/issues). You can also reach out to Sheila Saia (ssaia at ncsu dot edu) or Natalie Nelson (nnelson4 at ncsu dot edu).
+If you have any questions, feedback, or suggestions please submit issues [through GitHub (public)](https://github.com/open-climate-data-science/tutorial-advanced-track/issues). You can also reach out to Nicholas Gawron (ncgawron at ncsu dot edu) or Livia Popa (lopopa at ncsu dot edu).
