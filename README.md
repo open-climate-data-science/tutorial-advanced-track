@@ -35,3 +35,12 @@ After this 2 hours tutorial you will:
 - advanced_tutorial_student.ipynb: Binder Notebook file with empty code blocks used for tutorial purposed and live coding. Outputs not included. Runs in R kernel.
 - advanced_tutorial_teacher.ipynb: Binder Notebook file with filled out with solutions and ouput plots and models to advanced tutorial. Runs in R kernel.
 - cardinal_data.csv: CSV of ECONet Station Data used for PCA Bonus Section
+
+
+## Binder Information 
+
+If you wish to see the tutorials as presented in the Open Climate Data Science Workshop please visting the tutorial page of the [website](https://open-climate-data-science.github.io/tutorials/). Here you will find two links for the Beginner Track:
+    -  Student: A notebook with incomplete code blocks that was accessed by partipants
+    -  Teacher: A helpful reference guide with completed code from the tutorial
+   
+Please note a recording of the tutorial is also attached on the referenced website page. 
