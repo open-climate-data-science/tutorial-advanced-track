@@ -8,7 +8,7 @@ This work is licensed under a
 [cc-by-image]: https://i.creativecommons.org/l/by/4.0/88x31.png
 
 
-# ShellCast Attribution
+# NCSCO Workshop Advanced Track Tutorial Attribution
 
 See [CITATION.md](/CITATION.md) for details on how to provide attribution.
 
