@@ -1,7 +1,7 @@
 
 # To cite the NCSCO Workshop Advanced Track Tutorial , please use:
 
-> Gawron, N. C., and Popa, L. O., 2022. *NCSCO Workshop Advanced Track Tutorial*. North Carolina State University, College of Sciences, Raleigh, NC. Available online: [github.com/tutorial-advanced-track](https://github.com/open-climate-data-science/tutorial-advanced-track)
+> Gawron, N. C., Popa, L. O., Saia, S. M., and Rao, Y. ,2022. *NCSCO Workshop Advanced Track Tutorial*. North Carolina State University, College of Sciences, Raleigh, NC. Available online: [github.com/tutorial-advanced-track](https://github.com/open-climate-data-science/tutorial-advanced-track)
 
 
 #  NCSCO Workshop Advanced Track Tutorial License
